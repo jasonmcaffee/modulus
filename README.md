@@ -72,7 +72,7 @@ function moduleA(moduleB){..}
 
 //optional metadata
 moduleA.module = {
-    myCustomMetaData = 'widget'
+    myCustomMetaData : 'widget'
 }
 
 //module metadata is passed
