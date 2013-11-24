@@ -1,6 +1,11 @@
 # Modulus
 Drop dead simple module definition library.
 
+Modulus simplifies your module definitions by autowiring module function parameters based on the paramater name.
+e.g. having a parameter called moduleA in your module function will result in modulus finding moduleA and passing it to your module function.
+
+By ensuring that module names are unique, we can simplify resolving modules, and eliminate the need of worrying about paths, etc.
+
 ## Try it out!
 You can play with the specs by going [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js) and selecting Project -> Fork.
 
@@ -56,6 +61,33 @@ modulus.require(function (moduleB){
 ## Build Time Option
 
 ## Configuration
+### Special module processing
+Modulus allows you to process your modules at runtime:
+
+```javascript
+function moduleA(moduleB){..}
+
+//optional metadata
+moduleA.module = {
+    myCustomMetaData = 'widget'
+}
+
+//module metadata is passed
+modulus.on('registerModule', function(module){
+    if(module.myCustomMetaData == 'widget'){
+        handleWidgetModule(module);
+    }
+    if(module.name.indexOf('moduleA') >= 0){
+        specialProcessing(module);
+    }else if(module.path.indexOf('some/path/to/folder') >= 0){
+        specialProcessing(module);
+    }else if(module.deps.indexOf('moduleB') >= 0){
+        swapDependencies(module, 'moduleB', 'moduleBVersion2');
+    }
+});
+```
+
+
 
 
 

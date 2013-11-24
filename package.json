@@ -1,0 +1,20 @@
+{
+    "author": "Jason McAffee",
+    "name": "modulusjs",
+    "description": "drop dead simple module definition library",
+    "version": "0.0.1",
+    "homepage": "http://github.com/jasonmcaffee/modulus",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jasonmcaffee/modulus.git"
+    },
+    "bin": {"pound":"bin/modulus.js"},
+    "dependencies": {},
+    "devDependencies": {},
+    "optionalDependencies": {},
+    "engines": {
+        "node": "> 0.6.0"
+    },
+    "preferGlobal": true,
+    "keywords":["module", "amd"]
+}
