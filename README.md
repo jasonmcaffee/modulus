@@ -2,7 +2,7 @@
 Drop dead simple module definition library.
 
 ## Try it out!
-You can play with the specs [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js)
+You can play with the specs by going [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js) and selecting Project -> Fork.
 
 View the test results [here](https://codio.com/jasonmcaffee/modulus/master/preview/test.html)
 
