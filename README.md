@@ -59,10 +59,13 @@ modulus.require(function (moduleB){
 ## AMD
 
 ## Build Time Option
+If you choose to use the build time library, you have the option of using file names as module names instead of using the function name.
+
+This is preferred method, and eliminates the possibility of accidental overrides (someone creating two moduleA functions)
 
 ## Configuration
 ### Special module processing
-Modulus allows you to process your modules at runtime:
+Modulus allows you to process your modules at runtime, allowing you to easily build a framework on top of it.
 
 ```javascript
 function moduleA(moduleB){..}
