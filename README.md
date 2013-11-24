@@ -1,6 +1,11 @@
 # Modulus
 Drop dead simple module definition library.
 
+## Try it out!
+You can play with the specs [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js)
+
+View the test results [here](https://codio.com/jasonmcaffee/modulus/master/preview/test.html)
+
 ##Defining Modules
 To define a module, simply create a named function:
 
