@@ -1,3 +1,4 @@
+//comments
 function moduleB(moduleC){
     console.log('moduleB has been loaded');
     return {

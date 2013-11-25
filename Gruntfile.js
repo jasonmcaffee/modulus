@@ -106,6 +106,15 @@ module.exports = function (grunt) {
             console.log('build complete in %s ms', total);
             done(true);
         }
+
+        function buildError(errors){
+            var end = new Date().getTime();
+            var total = end - start;
+            console.log('build failed in %s ms', total);
+            //throw JSON.stringify(errors, null, 2);
+            grunt.fail.fatal(errors);
+            done(true);
+        }
         //var modulus = require('modulusjs');
         var modulus = require('./lib/modulus');
         //noinspection JSValidateTypes
@@ -164,7 +173,7 @@ module.exports = function (grunt) {
                     //...any metadata
                 }
             }
-        }, buildComplete);
+        }, buildComplete, buildError);
 
     });
 
