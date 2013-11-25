@@ -35,7 +35,7 @@ module.exports = function (grunt) {
         watch: {
             scripts: {
                 files: ['src/**/*.js'],
-                tasks: ['build-nn-core']
+                tasks: ['build']
             },
             specs: {
                 files: ['test/spec/**/*.js'],
@@ -97,12 +97,71 @@ module.exports = function (grunt) {
         });
 
     grunt.registerTask('test-commonjs-module', '', function(){
-        var modulus = require('.lib\\modulus.js');
-        modulus.config();
+        var done = this.async();
+        function buildComplete(){
+            done(true);
+        }
+        //var modulus = require('modulusjs');
+        var modulus = require('./lib/modulus');
+        //noinspection JSValidateTypes
+        modulus.build({
+            //the directory which should be scanned to find modules
+            baseDirectory: 'src/modules',
+            distDirectory: 'dist',
+            modulePattern: '**/*.js',
+            //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
+            shim:{
+                '$':{
+                    path: 'src/vendor/jquery-1.9.1.js',
+                    dependencies:[],
+                    exports:'$'
+                }
+            },
+            map:{
+                requestsFor:{
+                    'moduleA':{
+                        from:{
+                            'moduleB':{
+
+                            }
+                        }
+                    }
+                },
+                requestsFrom:{
+                    'moduleB':{
+                        for:{
+                            'moduleA':{
+                                shouldGetThisModuleInstead:{
+                                    'moduleB':{
+                                        //any configuration overrides
+                                    }
+                                },
+                                //or
+                                executeThisFirst: function(moduleA){
+
+                                }
+                                //...
+                            }
+                        }
+                    }
+                }
+            },
+            //process the module however you want.
+            onRegisterModule: function(moduleMetadata){
+
+            },
+
+            onUniqueModuleNameError: function(){
+
+            },
+            moduleMetadata:{
+                'moduleA' :{
+                    //...any metadata
+                }
+            }
+        }, buildComplete);
 
     });
-
-    grunt.registerTask('compile-nn-templates', ['compile-nn-core-templates']);
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-watch');

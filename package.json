@@ -10,13 +10,17 @@
     },
     "bin": {"pound":"bin/modulus.js"},
     "main": "lib/modulus.js",
-    "dependencies": {},
+    "dependencies": {
+        "glob":"3.2.7",
+        "q":"0.9.7"
+    },
     "devDependencies": {
         "grunt-contrib-jasmine": "~0.4.0",
         "grunt-contrib-watch": "0.4.4",
         "grunt-contrib-uglify": "0.2.4",
         "grunt": "0.4.1",
-        "handlebars": "1.0.12"
+        "handlebars": "1.0.12",
+        "modulusjs":">0.0.1"
     },
     "optionalDependencies": {},
     "engines": {
