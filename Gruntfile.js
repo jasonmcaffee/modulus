@@ -125,12 +125,12 @@ module.exports = function (grunt) {
                 directory: 'dist',
                 files:{
                     'moduleB.all.js':{
-                        modules:['moduleB'], //start at module b and include all it's dependencies.
-                        excludeModulesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
+                        dependencies:['moduleB'], //start at module b and include all it's dependencies.
+                        excludeDependenciesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
                     }
                 }
             },
-            modulePattern: '**/*.js',
+            modulePattern: '**/*.js', //glob pattern matching
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
                 '$':{
