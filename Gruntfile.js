@@ -97,8 +97,13 @@ module.exports = function (grunt) {
         });
 
     grunt.registerTask('test-commonjs-module', '', function(){
+        var start = new Date().getTime();
         var done = this.async();
+
         function buildComplete(){
+            var end = new Date().getTime();
+            var total = end - start;
+            console.log('build complete in %s ms', total);
             done(true);
         }
         //var modulus = require('modulusjs');
