@@ -120,8 +120,16 @@ module.exports = function (grunt) {
         //noinspection JSValidateTypes
         modulus.build({
             //the directory which should be scanned to find modules
-            baseDirectory: 'src/modules',
-            distDirectory: 'dist',
+            baseDirectory: 'src/modules', //the directory to scan for modules.
+            dist:{
+                directory: 'dist',
+                files:{
+                    'moduleB.all.js':{
+                        modules:['moduleB'], //start at module b and include all it's dependencies.
+                        excludeModulesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
+                    }
+                }
+            },
             modulePattern: '**/*.js',
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
@@ -129,35 +137,6 @@ module.exports = function (grunt) {
                     path: 'src/vendor/jquery-1.9.1.js',
                     dependencies:[],
                     exports:'$'
-                }
-            },
-            map:{
-                requestsFor:{
-                    'moduleA':{
-                        from:{
-                            'moduleB':{
-
-                            }
-                        }
-                    }
-                },
-                requestsFrom:{
-                    'moduleB':{
-                        for:{
-                            'moduleA':{
-                                shouldGetThisModuleInstead:{
-                                    'moduleB':{
-                                        //any configuration overrides
-                                    }
-                                },
-                                //or
-                                executeThisFirst: function(moduleA){
-
-                                }
-                                //...
-                            }
-                        }
-                    }
                 }
             },
             //process the module however you want.
@@ -173,6 +152,7 @@ module.exports = function (grunt) {
                     //...any metadata
                 }
             }
+
         }, buildComplete, buildError);
 
     });
