@@ -73,29 +73,6 @@ module.exports = function (grunt) {
         }
     });
 
-    /**
-     * Compiles js templates in src (e.g. nn.hbs.js).
-     */
-    grunt.registerTask('compile-nn-core-templates',
-        'the src js is a template so we can pick and choose what to include in the dist file', function(){
-            var config = grunt.config('nn');
-
-            //build core nn.js
-            var coreConfig = config.core;
-            var nnCoreTemplate = grunt.file.read(coreConfig.templateSrcFilePath);
-            var nnCoreTemplateFunction = handlebars.compile(nnCoreTemplate);
-            var nnCoreJs = nnCoreTemplateFunction(coreConfig.templateData);
-            grunt.file.write(coreConfig.distFilePath, nnCoreJs);
-
-            //build commonjs module
-            coreConfig.templateData.commonjs = true;
-            var nnCoreJs = nnCoreTemplateFunction(coreConfig.templateData);
-            grunt.file.write(coreConfig.commonJsDistFilePath, nnCoreJs);
-            coreConfig.templateData.commonjs = false;//reset
-
-
-        });
-
     grunt.registerTask('test-commonjs-module', '', function(){
         var start = new Date().getTime();
         var done = this.async();
@@ -122,9 +99,8 @@ module.exports = function (grunt) {
             //the directory which should be scanned to find modules
             baseDirectory: 'src/modules', //the directory to scan for modules.
             dist:{
-                directory: 'dist',
                 files:{
-                    'moduleB.all.js':{
+                    './dist/moduleB.all.js':{
                         dependencies:['moduleB'], //start at module b and include all it's dependencies.
                         excludeDependenciesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
                     }
