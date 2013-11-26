@@ -57,6 +57,24 @@ modulus.require(function (moduleB){
 ```
 
 ## AMD
+No AMD support yet, but it'll probably look something like:
+```javascript
+function moduleA(asynchModuleB){
+}
+moduleA.module = {
+    params:{
+        asynchModuleB: 'http://www.example.com/js/moduleB.js'
+    }
+}
+```
+or
+```javascript
+modulus.config({
+    paths:{
+        'asynchModuleB':'http://www.example.com/js/moduleB.js'
+    }
+});
+```
 
 ## Build Time Option
 If you choose to use the build time library, you have the option of using file names as module names instead of using the function name.
