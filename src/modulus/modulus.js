@@ -12,7 +12,15 @@
 //                 context: moduleMeta.context //the 'this' for the module init
 //             }
         },
-        
+
+        /**
+         * Runs the module function for the passed in module if the function has not been ran before (module.isInitted == false)
+         * Runs the init for any dependency modules if they have not been initialized
+         * Assigns the result of the function to module.initResult.
+         *
+         * @param module - the module you wish to init.
+         * @returns {*} - the result of module();
+         */
         initModule: function giveContext(module){
             console.log('init called for module.name: %s', module.name);
             //if the module has already been initialized, return it's result
@@ -29,7 +37,12 @@
             
             return module.initResult;
         },
-        
+
+        /**
+         * Finds all modules by name.
+         * @param arrayOfModuleNames - array of module names you wish to retrieve. e.g. ['moduleA', 'moduleB']
+         * @returns {{}} - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
+         */
         getModules: function(arrayOfModuleNames){
             var result = {
                 //'moduleX': {}    
@@ -44,7 +57,12 @@
             }
             return result;
         },
-        
+
+        /**
+         * Iterates over the hash of modules, passing each to initModule so the module and its dependencies can be initialized.
+         * @param modules - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
+         * @returns {Array} - array of results from the init. TODO: is this needed?
+         */
         initModules:function(modules){
             var moduleInitResults = [];
             modules = modules || this.modules;
@@ -56,7 +74,11 @@
             }
             return moduleInitResults;
         },
-        
+
+        /**
+         * Initializes all modules with autoInit metadata flag set to true.
+         * @param modules - optional - hash of modules you wish to init
+         */
         initAutoInitModules: function(modules){
             modules = modules || this.modules;
             console.log('initAutoInitModules called for %s modules.', modules);
@@ -65,6 +87,12 @@
                 this.initModule(module);
             }    
         },
+
+        /**
+         * Evaluates the function as a string and parses the parameters to determine module dependencies.
+         * @param func - the function you wish to find dependencies for.
+         * @returns {Array} - string array of dependencies. e.g. ['moduleB', 'moduleC']
+         */
         parseFunctionDependencies:function (func){
             var reg = /\((.*)\)/g;
             var funcString = func.toString();
@@ -74,12 +102,21 @@
             var deps = paramsAsString.split(',');
             return deps;
         },
-    
+
+        /**
+         * Adds the module to this.modules.
+         * e.g. this.modules[module.name] = module
+         * @param module - the module you wish to register.
+         */
         registerModule: function(module){
             console.log('registerModule called for module.name %s', module.name);
             this.modules[module.name] = module;
         },
-        
+
+        /**
+         * Iterates over the hash of modules and calls registerModule for each.
+         * @param modules - hash of modules you wish to register.
+         */
         registerModules: function (modules){
             if(!modules){return;}
             for(var moduleName in modules){
@@ -87,7 +124,14 @@
                 this.registerModule(module);
             }    
         },
-        
+
+        /**
+         * Creates the module metadata (name, dependencies, etc) for the passed in function
+         * This ultimately is used for this.modules.
+         * @param func - the function which represents the module
+         * @param force - if the func does not have metadata, we don't do anything with it, unless force is true.
+         * @returns {{name: *, paths: *, deps: *, resolvedDeps: undefined, autoInit: *, init: *, isInitted: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
+         */
         createModuleFromFunction: function(func, force){
             console.log('createModuleFromFunction called');
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
@@ -106,7 +150,12 @@
             };
             return module;
         },
-        
+
+        /**
+         * Iterates over the passed in array of functions and creates module metadata for each.
+         * @param funcArray - array of functions you wish to create modules from
+         * @returns {Array}
+         */
         createModulesFromFunctions: function (funcArray){
             var modules = [];
             for(var i=0; i < funcArray.length; ++i){
@@ -116,10 +165,13 @@
             }
             return modules;
         },
-        
-        
-        
-        //searches every function in the context
+
+        /**
+         * Iterates over every function defined in the specified context and determines if it should be considered
+         * a module. Currently this requires the function have a 'module' property assigned to it, but that may change.
+         * @param context - context which will be searched for potential module functions
+         * @returns {Array} - array of module functions
+         */
         findModuleFunctions: function(context){
             var foundModuleFunctions = [];
             context = context || modulusContext;
@@ -138,17 +190,33 @@
             console.log('foundModuleFunctions: ' + foundModuleFunctions);
             return foundModuleFunctions;
         },
-        
+
+        /**
+         * Finds all module functions in the context, creates metadata for each, and adds the metadata to this.modules.
+         */
         findAndRegisterModules:function (){
             var foundModuleFunctions = this.findModuleFunctions();
             var foundModules = this.createModulesFromFunctions(foundModuleFunctions);
             this.registerModules(foundModules);
         },
+
+        /**
+         * Starting point for modulus.
+         * Scans for module functions, creates metadata for each, adds metadata to this.modules, and runs any module functions
+         * with metadata autoInit = true.
+         */
         init:function(){
             this.findAndRegisterModules();
             this.initAutoInitModules();
         },
-        //either array or single string
+
+        /**
+         * Allows you to get module dependencies for the passed in anonymous function.
+         * e.g.
+         * modulus.require(function (moduleA, moduleB){...});
+         * would resolve moduleA and moduleB
+         * @param callback
+         */
         require:function(callback){
             var module = this.createModuleFromFunction(callback, true);
             this.initModule(module); 
