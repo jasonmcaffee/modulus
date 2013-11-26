@@ -5,3 +5,5 @@ function moduleD(){   //moduleB circular dependencies are not allowed.
         moduleD: true
     };
 }
+
+moduleD.module = true;

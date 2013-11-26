@@ -8,4 +8,4 @@ function moduleB(moduleC, moduleD){
 }
 
 //module meta data
-moduleB['%']=true;
+moduleB.module=true;

@@ -7,6 +7,6 @@ function moduleA(moduleB){
 }
 
 //module meta data
-moduleA['%'] = {
+moduleA.module = {
     autoInit: true //we want this module function to be ran without any other module requiring it first.
 };

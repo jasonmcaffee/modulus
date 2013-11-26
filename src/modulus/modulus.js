@@ -90,7 +90,7 @@
         
         createModuleFromFunction: function(func, force){
             console.log('createModuleFromFunction called');
-            var moduleMeta = typeof func['%'] == 'object' ? func['%'] : {};
+            var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
             var moduleName = moduleMeta.name || func.name;//explict overrides allowed. default is to use the function name.
             console.log('creating module from func for module.name: %s', moduleName);
@@ -128,7 +128,7 @@
                     //log('context is ' + context + ' key: ' + key);
                     try{//Unsafe JavaScript attempt to access frame with URL
                         var potential = context[key];
-                        if(typeof potential === "function" && potential['%']){ //
+                        if(typeof potential === "function" && potential.module){ //
                             foundModuleFunctions.push(potential);        
                         }
                     }catch(e){

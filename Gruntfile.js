@@ -73,6 +73,53 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask('build-testProject', '', function(){
+        var start = new Date().getTime();
+        var done = this.async();
+
+        function buildComplete(){
+            var end = new Date().getTime();
+            var total = end - start;
+            console.log('build complete in %s ms', total);
+            done(true);
+        }
+
+        function buildError(errors){
+            var end = new Date().getTime();
+            var total = end - start;
+            console.log('build failed in %s ms', total);
+            //throw JSON.stringify(errors, null, 2);
+            grunt.fail.fatal(errors);
+            done(true);
+        }
+        //var modulus = require('modulusjs');
+        var modulus = require('./lib/modulus');
+        //noinspection JSValidateTypes
+        modulus.build({
+            //the directory which should be scanned to find modules
+            baseDirectory: 'testProject/js', //the directory to scan for modules.
+            modulePattern: '**/*.js', //glob pattern matching
+            dist:{
+                files:{
+                    './dist/testProject/pageOne.js':{
+                        dependencies:['pageOne'], //start at module b and include all it's dependencies.
+                        excludeDependenciesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
+                    }
+                }
+            },
+            //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
+            shim:{
+                '$':{
+                    path: 'src/vendor/jquery-1.9.1.js',
+                    dependencies:[],
+                    exports:'$'
+                }
+            }
+
+        }, buildComplete, buildError);
+
+    });
+    //simple testing, including potential configuration options to come.
     grunt.registerTask('test-commonjs-module', '', function(){
         var start = new Date().getTime();
         var done = this.async();

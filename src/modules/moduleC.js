@@ -8,4 +8,4 @@ function moduleC(moduleD){
     return ++moduleCInitCount;
 }
 
-moduleC['%'] = true;
+moduleC.module = true;
