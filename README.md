@@ -63,6 +63,38 @@ If you choose to use the build time library, you have the option of using file n
 
 This is preferred method, and eliminates the possibility of accidental overrides (someone creating two moduleA functions)
 
+### Build Configuration
+Every aspect of the modulus build is customizable.  Modulus exposes all functions through the config so you can override any behavior.
+
+#### Simple Example
+```javascript
+var modulus = require('modulusjs');
+
+modulus.build({
+    //the directory which should be scanned to find modules
+    baseDirectory: 'testProject/js', //the directory to scan for modules.
+    modulePattern: '**/*.js', //glob pattern matching
+
+    //build distributions
+    dist:{
+        files:{
+            './dist/testProject/pageOne.js':{
+                dependencies:['pageOne'], //start at module b and include all it's dependencies.
+            }
+        }
+    },
+    //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
+    shim:{
+        '$':{
+            path: 'src/vendor/jquery-1.9.1.js',
+            dependencies:[],
+            exports:'$'
+        }
+    }
+
+}, buildComplete, buildError);
+```
+
 ## Configuration
 ### Special module processing
 Modulus allows you to process your modules at runtime, allowing you to easily build a framework on top of it.
@@ -89,6 +121,19 @@ modulus.on('registerModule', function(module){
     }
 });
 ```
+
+##TODO
+### Circular dependency detection
+lib/modulus.js _recursivelyFindDependencies needs detection for circular dependencies.
+
+What I would like is logic to detect that there is a circular dependency, and break out of recursion when it's detected.
+
+e.g. moduleA depends on moduleB which depends on moduleC which depends on moduleA.
+
+I haven't run into an issue with circular deps before, but I think it's a valid issue.
+http://stackoverflow.com/questions/4881059/how-to-handle-circular-dependencies-with-requirejs-amd
+
+
 
 
 
