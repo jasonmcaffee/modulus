@@ -141,6 +141,9 @@ modulus.on('registerModule', function(module){
 ```
 
 ##Contribute!
+Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
+Setup is super simple.
+
 ###Setup
 ```shell
 git clone https://github.com/jasonmcaffee/modulus.git
@@ -152,16 +155,11 @@ sudo npm install grunt-cli@0.1.9 -g
 ```shell
 grunt build
 ```
-##TODO
-### Circular dependency detection
-lib/modulus.js _recursivelyFindDependencies needs detection for circular dependencies.
-
-What I would like is logic to detect that there is a circular dependency, and break out of recursion when it's detected.
-
-e.g. moduleA depends on moduleB which depends on moduleC which depends on moduleA.
-
-I haven't run into an issue with circular deps before, but I think it's a valid issue.
-http://stackoverflow.com/questions/4881059/how-to-handle-circular-dependencies-with-requirejs-amd
+##Release Notes
+### 0.0.1
+In progress.
+Runtime configuration - basic poc of functionality working and shown on codio.
+Build configuration - basic functionality shown with grunt test-commonjs-module and src/modules.
 
 
 

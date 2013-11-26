@@ -103,7 +103,7 @@ module.exports = function (grunt) {
                 files:{
                     './dist/testProject/pageOne.js':{
                         dependencies:['pageOne'], //start at module b and include all it's dependencies.
-                        excludeDependenciesFoundIn:['someOtherBuiltModule.js'] //todo: for pages that have a global.js and a page.js
+                        excludes:['someModule'] //todo: for pages that have a global.js and a page.js
                     }
                 }
             },
