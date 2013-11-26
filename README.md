@@ -76,6 +76,19 @@ modulus.config({
 });
 ```
 
+You will probably also have to supply the async function:
+```javascript
+modulus.config({
+     asynchFileLoad: function(path, callback, errorback){
+         $.ajax({
+             url: path,
+             dataType: "script",
+             success: callback
+          }).fail(function(err){erroback(err)});
+     });
+});
+```
+
 ## Build Time Option
 If you choose to use the build time library, you have the option of using file names as module names instead of using the function name.
 
