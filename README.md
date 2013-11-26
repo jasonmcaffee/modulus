@@ -140,6 +140,18 @@ modulus.on('registerModule', function(module){
 });
 ```
 
+##Contribute!
+###Setup
+```shell
+git clone https://github.com/jasonmcaffee/modulus.git
+cd modulus
+npm install
+sudo npm install grunt-cli@0.1.9 -g
+```
+###Build
+```shell
+grunt build
+```
 ##TODO
 ### Circular dependency detection
 lib/modulus.js _recursivelyFindDependencies needs detection for circular dependencies.
