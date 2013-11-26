@@ -171,8 +171,8 @@ grunt build
 ##Release Notes
 ### 0.0.1
 In progress.
-Runtime configuration - basic poc of functionality working and shown on codio.
-Build configuration - basic functionality shown with grunt test-commonjs-module and src/modules.
+* Runtime configuration - basic poc of functionality working and shown on codio.
+* Build configuration - basic functionality shown with grunt test-commonjs-module and src/modules.
 
 
 
