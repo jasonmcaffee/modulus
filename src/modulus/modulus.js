@@ -2,22 +2,28 @@
     /**
      * Shallow merge of defaults and overrides into a new object which is returned.
      * Similar to _.extend or $.extend
-     * @param - defaults - default values, which are gauranteed to exist unless overridden by overrides param
-     * @param - overrides - any properties you wish to override
+     * @param defaults - default values, which are gauranteed to exist unless overridden by overrides param
+     * @param overrides - any properties you wish to override
      * @returns - {} - object representing the merger between defaults and overrides.
      */
     function merge(defaults, overrides){
-        var result = {};
-        for(var key in defaults){
+        var result = {}, key;
+        for(key in defaults){
             result[key]=defaults[key];
         }
-        for(var key in overrides){
+        for(key in overrides){
             result[key]=overrides[key];
         }
         return result;
     }
 
     var defaults = {
+        shim:{
+            '$':{
+                dependencies:[],
+                exports:'$'
+            }
+        },
         _modules: {
 //             'moduleX':{
 //                 name: moduleMeta.name,
@@ -26,13 +32,30 @@
 //                 autoInit: moduleMeta.autoInit,
 //                 init: func,
 //                 initResult: undefined, //result from running init
-//                 isInitted: false,
+//                 isInitialized: false,
 //                 context: moduleMeta.context //the 'this' for the module init
 //             }
         },
 
         /**
-         * Runs the module function for the passed in module if the function has not been ran before (module.isInitted == false)
+         * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
+         * @param modules - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
+         * @returns {Array} - array of results from the init. (needed to pass results into module.apply)
+         */
+        _initModules:function(modules){
+            var moduleInitResults = [];
+            modules = modules || this._modules;
+            console.log('_initModules called for %s modules.', modules);
+            for(var moduleName in modules){
+                var module = modules[moduleName];
+                this._initModule(module);
+                moduleInitResults.push(module.initResult);
+            }
+            return moduleInitResults;
+        },
+
+        /**
+         * Runs the module function for the passed in module if the function has not been ran before (module.isInitialized == false)
          * Runs the init for any dependency modules if they have not been initialized
          * Assigns the result of the function to module.initResult.
          *
@@ -42,13 +65,18 @@
         _initModule: function giveContext(module){
             console.log('init called for module.name: %s', module.name);
             //if the module has already been initialized, return it's result
-            if(module.isInitted){ return module.initResult; }
+            if(module.isInitialized){ return module.initResult; }
             try{
-                var modules = this._getModules(module.deps);
-                console.log('module.name: %s depends on modules %s', module.name, module.deps);
-                var resolvedDependencies = this._initModules(modules);//make sure all deps are initted.
+                //retrieve module metadata for the dependencies
+                var modules = this._getModules(module.dependencies);
+                console.log('module.name: %s depends on modules %s', module.name, module.dependencies);
+
+                //init all dependencies
+                var resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
+
+                //run the module init
                 module.initResult = module.init.apply(undefined, resolvedDependencies);
-                module.isInitted = true;
+                module.isInitialized = true;
             }catch(e){
                 console.error('error initting module.name: %s \n error: %s', module.name, e);
             }
@@ -77,23 +105,6 @@
         },
 
         /**
-         * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
-         * @param modules - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
-         * @returns {Array} - array of results from the init. TODO: is this needed?
-         */
-        _initModules:function(modules){
-            var moduleInitResults = [];
-            modules = modules || this._modules;
-            console.log('_initModules called for %s modules.', modules);
-            for(var moduleName in modules){
-                var module = modules[moduleName];
-                this._initModule(module);
-                moduleInitResults.push(module.initResult);
-            }
-            return moduleInitResults;
-        },
-
-        /**
          * Initializes all modules with autoInit metadata flag set to true.
          * @param modules - optional - hash of modules you wish to init
          */
@@ -117,8 +128,8 @@
             var matches = reg.exec(funcString);//funcString.match(reg)[0];
             var paramsAsString = matches? matches[1] : '';
             paramsAsString = paramsAsString.replace(/\s/g, '');
-            var deps = paramsAsString.split(',');
-            return deps;
+            var dependencies = paramsAsString.split(',');
+            return dependencies;
         },
 
         /**
@@ -148,7 +159,7 @@
          * This ultimately is used for this._modules.
          * @param func - the function which represents the module
          * @param force - if the func does not have metadata, we don't do anything with it, unless force is true.
-         * @returns {{name: *, paths: *, deps: *, resolvedDeps: undefined, autoInit: *, init: *, isInitted: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
+         * @returns {{name: *, paths: *, dependencies: *, resolvedDeps: undefined, autoInit: *, init: *, isInitialized: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
          */
         _createModuleFromFunction: function(func, force){
             console.log('_createModuleFromFunction called');
@@ -159,11 +170,11 @@
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,
-                deps : this._parseFunctionDependencies(func),
+                dependencies : this._parseFunctionDependencies(func),
                 resolvedDeps: undefined,
                 autoInit: moduleMeta.autoInit, //whether the module should be evaluated before any one else asks for it.
                 init: func,
-                isInitted: false,
+                isInitialized: false,
                 context: moduleMeta.context
             };
             return module;
@@ -210,6 +221,46 @@
         },
 
         /**
+         * Iterates over each property in config.shim and creates a corresponding module metadata object.
+         * Shim modules will have isInitialized set to true, and initResult equal to the export.
+         * All shimmed module libs must be loaded!
+         * @returns {Array} - module metadata array
+         */
+        _createModulesFromShim: function(){
+            if(!this.config || !this.config.shim){return;}
+            var shimModules = [];
+            for(var shimName in this.config.shim){
+                var shimEntry = this.config.shim[shimName];
+                var module = this._createModuleFromShim(shimName, shimEntry);
+                shimModules.push(module);
+            }
+            return shimModules;
+        },
+
+        /**
+         * Creates module metadata based on the shim config entry.
+         * Uses eval(shimConfig.exports) to get the initResult
+         * Note: eval is faster than new Function http://jsperf.com/eval-vs-new-func
+         *
+         * @param shimName
+         * @param shimConfig
+         * @private
+         */
+        _createModuleFromShim: function(shimName, shimConfig){
+            var module = {
+                 name: shimName,
+                 paths: null, //todo?
+                 dependencies : shimConfig.dependencies,
+                 autoInit: false,
+                 init: undefined, //should never be called.
+                 initResult: eval(shimConfig.exports), //result from running init
+                 isInitialized: true,
+                 context: null //should never be referenced.
+             };
+            return module;
+        },
+
+        /**
          * Finds all module functions in the context, creates metadata for each, and adds the metadata to this._modules.
          */
         _findAndRegisterModules:function (){
@@ -219,6 +270,9 @@
         }
     };
 
+    /**
+     * The modulus.
+     */
     var modulus = {
         /**
          * Starting point for modulus.
@@ -243,6 +297,7 @@
             this.config._initModule(module);
         }
     };
-    
+
+    //assign modulus to the global scope.
     modulusContext.modulus = modulus;
 })(window);
