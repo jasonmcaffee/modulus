@@ -9,7 +9,7 @@ By ensuring that module names are unique, we can simplify resolving modules, and
 ## Try it out!
 You can play with the specs by going [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js) and selecting Project -> Fork.
 
-View the test results [here](https://codio.com/jasonmcaffee/modulus/master/preview/test.html)
+View the test results [here](https://codio.com/jasonmcaffee/modulus/master/preview/test-runtime-project.html)
 
 ##Defining Modules
 To define a module, simply create a named function:

@@ -28,7 +28,7 @@ describe("modulus", function(){
         }); 
     });
 
-    it("should support shimming", function(){
+    it("should support shimming third party libraries", function(){
         var callbackExecuted = false;
         modulus.init({
             shim:{
