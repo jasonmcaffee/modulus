@@ -1,5 +1,23 @@
 (function(modulusContext){
-    var modulus = {
+    /**
+     * Shallow merge of defaults and overrides into a new object which is returned.
+     * Similar to _.extend or $.extend
+     * @param - defaults - default values, which are gauranteed to exist unless overridden by overrides param
+     * @param - overrides - any properties you wish to override
+     * @returns - {} - object representing the merger between defaults and overrides.
+     */
+    function merge(defaults, overrides){
+        var result = {};
+        for(var key in defaults){
+            result[key]=defaults[key];
+        }
+        for(var key in overrides){
+            result[key]=overrides[key];
+        }
+        return result;
+    }
+
+    var defaults = {
         _modules: {
 //             'moduleX':{
 //                 name: moduleMeta.name,
@@ -32,9 +50,9 @@
                 module.initResult = module.init.apply(undefined, resolvedDependencies);
                 module.isInitted = true;
             }catch(e){
-                console.error('error initting module.name: %s \n error: %s', module.name, e);                
+                console.error('error initting module.name: %s \n error: %s', module.name, e);
             }
-            
+
             return module.initResult;
         },
 
@@ -45,15 +63,15 @@
          */
         _getModules: function(arrayOfModuleNames){
             var result = {
-                //'moduleX': {}    
+                //'moduleX': {}
             };
             for(var i=0; i < arrayOfModuleNames.length; ++i){
                 var moduleName = arrayOfModuleNames[i];
                 var module = this._modules[moduleName];
                 if(module){
-                    result[module.name] = module;    
+                    result[module.name] = module;
                 }
-                
+
             }
             return result;
         },
@@ -85,7 +103,7 @@
             for(var moduleName in modules){
                 var module = modules[moduleName];
                 this._initModule(module);
-            }    
+            }
         },
 
         /**
@@ -122,7 +140,7 @@
             for(var moduleName in modules){
                 var module = modules[moduleName];
                 this._registerModule(module);
-            }    
+            }
         },
 
         /**
@@ -139,7 +157,7 @@
             var moduleName = moduleMeta.name || func.name;//explict overrides allowed. default is to use the function name.
             console.log('creating module from func for module.name: %s', moduleName);
             var module={
-                name: moduleName, 
+                name: moduleName,
                 paths: moduleMeta.paths,
                 deps : this._parseFunctionDependencies(func),
                 resolvedDeps: undefined,
@@ -181,7 +199,7 @@
                     try{//Unsafe JavaScript attempt to access frame with URL
                         var potential = context[key];
                         if(typeof potential === "function" && potential.module){ //
-                            foundModuleFunctions.push(potential);        
+                            foundModuleFunctions.push(potential);
                         }
                     }catch(e){
                     }
@@ -198,16 +216,19 @@
             var foundModuleFunctions = this._findModuleFunctions();
             var foundModules = this._createModulesFromFunctions(foundModuleFunctions);
             this._registerModules(foundModules);
-        },
+        }
+    };
 
+    var modulus = {
         /**
          * Starting point for modulus.
          * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
          * with metadata autoInit = true.
          */
-        init:function(){
-            this._findAndRegisterModules();
-            this._initAutoInitModules();
+        init:function(settings){
+            this.config = merge(defaults, settings);
+            this.config._findAndRegisterModules();
+            this.config._initAutoInitModules();
         },
 
         /**
@@ -218,8 +239,8 @@
          * @param callback
          */
         require:function(callback){
-            var module = this._createModuleFromFunction(callback, true);
-            this._initModule(module);
+            var module = this.config._createModuleFromFunction(callback, true);
+            this.config._initModule(module);
         }
     };
     

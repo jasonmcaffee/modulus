@@ -30,11 +30,11 @@ describe("modulus", function(){
 
 describe("modulus - internal", function(){
     it("should find modulus modules declared in the global scope", function(){
-        expect(modulus._modules.moduleA.initResult.prop1).toEqual(123);
-        expect(modulus._modules.moduleB.initResult.b).toEqual('this i b');
+        expect(modulus.config._modules.moduleA.initResult.prop1).toEqual(123);
+        expect(modulus.config._modules.moduleB.initResult.b).toEqual('this i b');
     });
 
     it("should ensure that modules get their dependencies via params to module function", function(){
-        expect(modulus._modules.moduleA.initResult.moduleB).toEqual(modulus._modules.moduleB.initResult);
+        expect(modulus.config._modules.moduleA.initResult.moduleB).toEqual(modulus.config._modules.moduleB.initResult);
     });
 });
