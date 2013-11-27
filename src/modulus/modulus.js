@@ -18,12 +18,12 @@
     }
 
     var defaults = {
-        shim:{
-            '$':{
-                dependencies:[],
-                exports:'$'
-            }
-        },
+//        shim:{
+//            '$':{
+//                dependencies:[],
+//                exports:'$'
+//            }
+//        },
         _modules: {
 //             'moduleX':{
 //                 name: moduleMeta.name,
@@ -78,7 +78,10 @@
                 module.initResult = module.init.apply(undefined, resolvedDependencies);
                 module.isInitialized = true;
             }catch(e){
-                console.error('error initting module.name: %s \n error: %s', module.name, e);
+                var errorMessage = 'modulus: error initializing module.name: ' + (module.name || 'anonymous' )+ '\n error:'; //+ ' \n error: ' + e
+                console.error(errorMessage);
+                e.message = errorMessage + e.message;
+                throw e; //do not swallow exceptions! if there's any error in the module init, we need to let it propogate.
             }
 
             return module.initResult;
@@ -227,10 +230,10 @@
          * @returns {Array} - module metadata array
          */
         _createModulesFromShim: function(){
-            if(!this.config || !this.config.shim){return;}
+            if(!this.shim){return [];}
             var shimModules = [];
-            for(var shimName in this.config.shim){
-                var shimEntry = this.config.shim[shimName];
+            for(var shimName in this.shim){
+                var shimEntry = this.shim[shimName];
                 var module = this._createModuleFromShim(shimName, shimEntry);
                 shimModules.push(module);
             }
@@ -251,11 +254,8 @@
                  name: shimName,
                  paths: null, //todo?
                  dependencies : shimConfig.dependencies,
-                 autoInit: false,
-                 init: undefined, //should never be called.
                  initResult: eval(shimConfig.exports), //result from running init
-                 isInitialized: true,
-                 context: null //should never be referenced.
+                 isInitialized: true
              };
             return module;
         },
@@ -266,6 +266,10 @@
         _findAndRegisterModules:function (){
             var foundModuleFunctions = this._findModuleFunctions();
             var foundModules = this._createModulesFromFunctions(foundModuleFunctions);
+            if(this.shim){
+                var shimModules = this._createModulesFromShim();
+                foundModules = foundModules.concat(shimModules);
+            }
             this._registerModules(foundModules);
         }
     };
