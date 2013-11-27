@@ -127,6 +127,26 @@ modulus.build({
 ```
 
 ## Configuration
+
+### Shim
+Third party libraries and other modules which aren't written in the modulus format can still be used, so long as you
+provide a shim configuration.
+
+For example, if you wanted to use jquery as a dependency in your modules, you could create a shim:
+```javascript
+modulus.init({
+    shim:{
+        '$':{
+            dependencies:[],
+            exports: '$'
+        }
+    }
+});
+
+function moduleA($){
+    var $body = $('body');
+}
+```
 ### Special module processing
 Modulus allows you to process your modules at runtime, allowing you to easily build a framework on top of it.
 
