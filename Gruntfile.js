@@ -94,7 +94,7 @@ module.exports = function (grunt) {
         }
         //var modulus = require('modulusjs');
         var modulus = require('./lib/modulus');
-        //noinspection JSValidateTypes
+
         modulus.build({
             //the directory which should be scanned to find modules
             baseDirectory: 'testProject/js', //the directory to scan for modules.
@@ -110,7 +110,7 @@ module.exports = function (grunt) {
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
                 '$':{
-                    path: 'src/vendor/jquery-1.9.1.js',
+                    path: 'testProject/js/vendor/jquery-1.10.2.min.js',
                     dependencies:[],
                     exports:'$'
                 }
