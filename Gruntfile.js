@@ -113,6 +113,16 @@ module.exports = function (grunt) {
                     path: 'testProject/js/vendor/jquery-1.10.2.min.js',
                     dependencies:[],
                     exports:'$'
+                },
+                'Backbone':{
+                    path: 'testProject/js/vendor/backbone-1.1.0.min.js',
+                    dependencies: ['_', '$'],
+                    exports:'Backbone'
+                },
+                '_':{
+                    path: 'testProject/js/vendor/underscore-1.5.2.min.js',
+                    dependencies: [],
+                    exports:'_'
                 }
             }
 
