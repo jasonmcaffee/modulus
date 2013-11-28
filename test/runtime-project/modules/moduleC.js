@@ -7,5 +7,3 @@ function moduleC(moduleD){
     console.log('module moduleC has been loaded');
     return ++moduleCInitCount;
 }
-
-moduleC.module = true;

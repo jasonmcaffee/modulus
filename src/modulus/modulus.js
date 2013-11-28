@@ -18,7 +18,7 @@
     }
 
     function log(){
-        return;
+        //return;
         if(window.console && window.console.log){
             console.log.apply(console, arguments);
         }
@@ -47,7 +47,7 @@
         /**
          * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
          * @param modules - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
-         * @returns {Array} - array of results from the init. (needed to pass results into module.apply)
+         * @returns {Array} - array of results from the init. (needed to pass results into module.init.apply)
          */
         _initModules:function(modules){
             var moduleInitResults = [];
@@ -74,13 +74,15 @@
             //if the module has already been initialized, return it's result
             if(module.isInitialized){ return module.initResult; }
             try{
+                var resolvedDependencies = [];
                 //retrieve module metadata for the dependencies
-                var modules = this._getModules(module.dependencies);
-                log('module.name: %s depends on modules %s', module.name, module.dependencies);
+                if(module.dependencies && module.dependencies.length > 0){
+                    var modules = this._getModules(module.dependencies);
+                    log('module.name: %s depends on modules %s', module.name, module.dependencies);
 
-                //init all dependencies
-                var resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
-
+                    //init all dependencies
+                    resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
+                }
                 //run the module init
                 module.initResult = module.init.apply(undefined, resolvedDependencies);
                 module.isInitialized = true;
@@ -151,7 +153,9 @@
          */
         _registerModule: function(module){
             log('_registerModule called for module.name %s', module.name);
-            this._modules[module.name] = module;
+            //if(!this._modules[module.name]){ //don't allow a module to be re-registered (protection from overrides)
+                this._modules[module.name] = module;
+           // }
         },
 
         /**
@@ -317,6 +321,10 @@
             log('modulus initialized in %s ms', total);
         },
 
+        register:function(settings){
+            this.config = merge(defaults, settings);
+            this.config._findAndRegisterModules();
+        },
         /**
          * Allows you to get module dependencies for the passed in anonymous function.
          * e.g.

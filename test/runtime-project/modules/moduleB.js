@@ -6,6 +6,3 @@ function moduleB(moduleC, moduleD){
         moduleC: moduleC
     };    
 }
-
-//module meta data
-moduleB.module=true;

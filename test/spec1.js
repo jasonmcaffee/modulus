@@ -5,7 +5,7 @@ describe("modulus", function(){
     it("should support a require function which resolves dependencies", function(){
         var callbackExecuted = false;
         modulus.init();
-        modulus.require(function(moduleA, moduleB, moduleC){
+        modulus.require(function anon(moduleA, moduleB, moduleC){
             callbackExecuted = true;
             expect(moduleA.prop1).toEqual(123);
             expect(moduleA.moduleB).toEqual(moduleB);
