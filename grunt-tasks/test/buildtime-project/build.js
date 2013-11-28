@@ -1,20 +1,13 @@
 module.exports = function(grunt){
     //simple testing, including potential configuration options to come.
     grunt.registerTask('build-buildtime-project', '', function(){
-        var start = new Date().getTime();
         var done = this.async();
 
         function buildComplete(){
-            var end = new Date().getTime();
-            var total = end - start;
-            console.log('build complete in %s ms', total);
             done(true);
         }
 
         function buildError(errors){
-            var end = new Date().getTime();
-            var total = end - start;
-            console.log('build failed in %s ms', total);
             //throw JSON.stringify(errors, null, 2);
             grunt.fail.fatal(errors);
             done(true);

@@ -173,6 +173,19 @@ modulus.on('registerModule', function(module){
 });
 ```
 
+##FAQ
+### Isn't it dangerous to globally define module functions.
+Perhaps, but let's consider a few scenarios.
+After modulus.init has been called, it doesn't matter if your module functions have been overriden with new functions.
+e.g.
+```javascript
+function moduleA(){}
+modulus.init();
+//moduleA is referenced in memory so any changes won't matter.
+moduleA = false;
+delete moduleA;
+```
+
 ##Contribute!
 Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
 Setup is super simple.
