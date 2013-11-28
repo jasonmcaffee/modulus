@@ -97,13 +97,16 @@ module.exports = function (grunt) {
 
         modulus.build({
             //the directory which should be scanned to find modules
-            baseDirectory: 'testProject/js', //the directory to scan for modules.
+            baseDirectory: 'test/testProject/js', //the directory to scan for modules.
             modulePattern: '**/*.js', //glob pattern matching
             dist:{
                 files:{
-                    './dist/testProject/pageOne.js':{
+                    './dist/test/testProject/pageOne.js':{
                         dependencies:['pageOne'], //start at module b and include all it's dependencies.
-                        excludes:['someModule'] //todo: for pages that have a global.js and a page.js
+                        excludes:['global'] //todo: for pages that have a global.js and a page.js
+                    },
+                    './dist/test/testProject/global.js':{
+                        dependencies:['global']
                     }
                 }
             },
