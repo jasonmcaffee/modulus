@@ -97,29 +97,53 @@ This is preferred method, and eliminates the possibility of accidental overrides
 ### Build Configuration
 Every aspect of the modulus build is customizable.  Modulus exposes all functions through the config so you can override any behavior.
 
-#### Simple Example
+#### Buildtime Project Example
+
+An example project that is built by modulus can be found [here](test/buildtime-project).
+
+The grunt task used to build the project via modulus can be found [here](grunt-tasks/test/buildtime-project).
+
+The buildtime project is built to [this directory](dist/test/buildtime-project)
+
+You can run the build using:
+```
+grunt build-buildtime-project
+```
+
 ```javascript
 var modulus = require('modulusjs');
 
 modulus.build({
     //the directory which should be scanned to find modules
-    baseDirectory: 'testProject/js', //the directory to scan for modules.
+    baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
     modulePattern: '**/*.js', //glob pattern matching
-
-    //build distributions
     dist:{
         files:{
-            './dist/testProject/pageOne.js':{
+            './dist/test/buildtime-project/pageOne.js':{
                 dependencies:['pageOne'], //start at module b and include all it's dependencies.
+                excludes:['global'] //todo: for pages that have a global.js and a page.js
+            },
+            './dist/test/buildtime-project/global.js':{
+                dependencies:['global']
             }
         }
     },
     //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
     shim:{
         '$':{
-            path: 'src/vendor/jquery-1.9.1.js',
+            path: 'test/buildtime-project/js/vendor/jquery-1.10.2.min.js',
             dependencies:[],
             exports:'$'
+        },
+        'Backbone':{
+            path: 'test/buildtime-project/js/vendor/backbone-1.1.0.min.js',
+            dependencies: ['_', '$'],
+            exports:'Backbone'
+        },
+        '_':{
+            path: 'test/buildtime-project/js/vendor/underscore-1.5.2.min.js',
+            dependencies: [],
+            exports:'_'
         }
     }
 
