@@ -152,6 +152,7 @@ modulus.build({
 
 }, buildComplete, buildError);
 ```
+NOTE: currently you have to duplicate your shim configuration during runtime via modulus.init({shim:...})  (only needed if you add other 3rd party libs)
 
 ## Configuration
 
