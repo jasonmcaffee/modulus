@@ -100,10 +100,13 @@ Every aspect of the modulus build is customizable.  Modulus exposes all function
 #### Buildtime Project Example
 
 An example project that is built by modulus can be found [here](test/buildtime-project).
+The spec is also in this folder if you want to modify it.
 
-The grunt task used to build the project via modulus can be found [here](grunt-tasks/test/buildtime-project).
+The grunt task used to build the project via modulus can be found [here](grunt-tasks/test/buildtime-project/build.js).
 
 The buildtime project is built to [this directory](dist/test/buildtime-project)
+
+The test page for the buildtime project can be found [here](test-buildtime-project.html).
 
 You can run the build using:
 ```
