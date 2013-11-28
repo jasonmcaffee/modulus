@@ -17,6 +17,13 @@
         return result;
     }
 
+    function log(){
+        return;
+        if(window.console && window.console.log){
+            console.log.apply(console, arguments);
+        }
+    }
+
     var defaults = {
 //        shim:{
 //            '$':{
@@ -45,7 +52,7 @@
         _initModules:function(modules){
             var moduleInitResults = [];
             modules = modules || this._modules;
-            console.log('_initModules called for %s modules.', modules);
+            log('_initModules called for %s modules.', modules);
             for(var moduleName in modules){
                 var module = modules[moduleName];
                 this._initModule(module);
@@ -63,13 +70,13 @@
          * @returns {*} - the result of module();
          */
         _initModule: function giveContext(module){
-            console.log('init called for module.name: %s', module.name);
+            log('init called for module.name: %s', module.name);
             //if the module has already been initialized, return it's result
             if(module.isInitialized){ return module.initResult; }
             try{
                 //retrieve module metadata for the dependencies
                 var modules = this._getModules(module.dependencies);
-                console.log('module.name: %s depends on modules %s', module.name, module.dependencies);
+                log('module.name: %s depends on modules %s', module.name, module.dependencies);
 
                 //init all dependencies
                 var resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
@@ -113,10 +120,12 @@
          */
         _initAutoInitModules: function(modules){
             modules = modules || this._modules;
-            console.log('_initAutoInitModules called for %s modules.', modules);
+            //log('_initAutoInitModules called for %s modules.', modules);
             for(var moduleName in modules){
                 var module = modules[moduleName];
-                this._initModule(module);
+                if(module.autoInit){
+                    this._initModule(module);
+                }
             }
         },
 
@@ -141,7 +150,7 @@
          * @param module - the module you wish to register.
          */
         _registerModule: function(module){
-            console.log('_registerModule called for module.name %s', module.name);
+            log('_registerModule called for module.name %s', module.name);
             this._modules[module.name] = module;
         },
 
@@ -165,11 +174,11 @@
          * @returns {{name: *, paths: *, dependencies: *, resolvedDeps: undefined, autoInit: *, init: *, isInitialized: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
          */
         _createModuleFromFunction: function(func, force){
-            console.log('_createModuleFromFunction called');
+            log('_createModuleFromFunction called');
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
             var moduleName = moduleMeta.name || func.name;//explict overrides allowed. default is to use the function name.
-            console.log('creating module from func for module.name: %s', moduleName);
+            log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,
@@ -212,15 +221,30 @@
                     //log('context is ' + context + ' key: ' + key);
                     try{//Unsafe JavaScript attempt to access frame with URL
                         var potential = context[key];
-                        if(typeof potential === "function" && potential.module){ //
+                        if(this._isModule(potential, context, key)){ //
                             foundModuleFunctions.push(potential);
                         }
                     }catch(e){
                     }
                 }
             }
-            console.log('foundModuleFunctions: ' + foundModuleFunctions);
+            //log('foundModuleFunctions: ' + foundModuleFunctions);
             return foundModuleFunctions;
+        },
+
+        /**
+         * Determines whether property from the context is considered a module or not.
+         * @param val - the thing we are evaluating and determining if it is a module or not.
+         * @param context - the context from which the val came from e.g. window
+         * @param key - the name of the context property
+         * @returns {boolean} - whether val is a module.
+         */
+        _isModule: function(val, context, key){
+            var isModule = false;
+            if(typeof val === "function"){ //  //&& val.module
+                isModule = true;
+            }
+            return isModule;
         },
 
         /**
@@ -284,9 +308,13 @@
          * with metadata autoInit = true.
          */
         init:function(settings){
+            var start = new Date().getTime();
             this.config = merge(defaults, settings);
             this.config._findAndRegisterModules();
             this.config._initAutoInitModules();
+            var end = new Date().getTime();
+            var total = end -start;
+            log('modulus initialized in %s ms', total);
         },
 
         /**
