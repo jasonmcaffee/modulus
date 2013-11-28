@@ -97,15 +97,15 @@ module.exports = function (grunt) {
 
         modulus.build({
             //the directory which should be scanned to find modules
-            baseDirectory: 'test/testProject/js', //the directory to scan for modules.
+            baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
             modulePattern: '**/*.js', //glob pattern matching
             dist:{
                 files:{
-                    './dist/test/testProject/pageOne.js':{
+                    './dist/test/buildtime-project/pageOne.js':{
                         dependencies:['pageOne'], //start at module b and include all it's dependencies.
                         excludes:['global'] //todo: for pages that have a global.js and a page.js
                     },
-                    './dist/test/testProject/global.js':{
+                    './dist/test/buildtime-project/global.js':{
                         dependencies:['global']
                     }
                 }
@@ -113,17 +113,17 @@ module.exports = function (grunt) {
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
                 '$':{
-                    path: 'testProject/js/vendor/jquery-1.10.2.min.js',
+                    path: 'test/buildtime-project/js/vendor/jquery-1.10.2.min.js',
                     dependencies:[],
                     exports:'$'
                 },
                 'Backbone':{
-                    path: 'testProject/js/vendor/backbone-1.1.0.min.js',
+                    path: 'test/buildtime-project/js/vendor/backbone-1.1.0.min.js',
                     dependencies: ['_', '$'],
                     exports:'Backbone'
                 },
                 '_':{
-                    path: 'testProject/js/vendor/underscore-1.5.2.min.js',
+                    path: 'test/buildtime-project/js/vendor/underscore-1.5.2.min.js',
                     dependencies: [],
                     exports:'_'
                 }
