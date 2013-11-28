@@ -177,7 +177,7 @@ modulus.on('registerModule', function(module){
 ### Isn't it dangerous to globally define module functions?
 Perhaps, but let's consider a few scenarios.
 #### Overridding Module Functions After Init Won't Matter
-After modulus.init has been called, it doesn't matter if your module functions have been overriden with new functions.
+After modulus.init has been called, it doesn't matter if your module functions have been overridden with new functions.
 e.g.
 ```javascript
 function moduleA(){}
@@ -189,6 +189,27 @@ delete moduleA;
 modulus.require(function(moduleA){..});
 ```
 
+#### What about accidentally overridding 3rd party functions
+You can load your third party libs after modules have been registered.
+e.g.
+```javascript
+//define your modules first
+function $(){} //uh oh
+modulus.register();
+//jquery code
+(function(){jquery stuff})()
+modulus.init();
+```
+
+#### But I don't like global functions!
+Fine
+```javascript
+var namespace ={};
+namespace.moduleA = function(moduleB){};
+namespace.moduleB = function(){};
+
+modulus.init({context: namespace});
+```
 ##Contribute!
 Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
 Setup is super simple.
