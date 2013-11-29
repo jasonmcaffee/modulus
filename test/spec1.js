@@ -20,11 +20,11 @@ describe("modulus", function(){
     it("should only call a module's init once", function(){
         modulus.init();
         modulus.require(function(moduleC){
-            expect(moduleC).toEqual(2); //since we call init again, count is 2 at this point
+            expect(moduleC).toEqual(1); //since we call init again, count is 2 at this point
         });
         
         modulus.require(function(moduleC){
-            expect(moduleC).toEqual(2);
+            expect(moduleC).toEqual(1);
         }); 
     });
 

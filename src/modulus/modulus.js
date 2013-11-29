@@ -145,11 +145,12 @@
         /**
          * Adds the module to this._modules.
          * e.g. this.modules[module.name] = module
+         * If the module is already added, it will not be overridden, unless it is a shim
          * @param module - the module you wish to register.
          */
         _registerModule: function(module){
             log('_registerModule called for module.name %s', module.name);
-            if(!this._modules[module.name]){ //don't allow a module to be re-registered (protection from overrides)
+            if(!this._modules[module.name] || module.isShim){ //don't allow a module to be re-registered (protection from overrides)
                 this._modules[module.name] = module;
             }
         },
@@ -280,7 +281,8 @@
                  paths: null, //todo?
                  dependencies : shimConfig.dependencies,
                  initResult: eval(shimConfig.exports), //result from running init
-                 isInitialized: true
+                 isInitialized: true,
+                 isShim: true
              };
             return module;
         },
@@ -301,9 +303,16 @@
 
     /**
      * The modulus.
+     * This function represents require and define.
+     * If you pass in a named function, it will be defined, and the function will not be executed immediately.
+     * If you pass in a unnamed function, it will act as require, and the function will be executed immediately and passed its dependencies.
      */
-    function modulus(func){
+    function modulus(func, metadata){
+        if(func.name){
 
+        }else{
+
+        }
     }
     /**
      * Starting point for modulus.
@@ -312,15 +321,18 @@
      */
     modulus.init = function(settings){
         var start = new Date().getTime();
-        defaults._modules = {};//todo: there is an issue with merge being shallow. investigate how serious. (several calls to init may not behave as expected).
+        //defaults._modules = {};//todo: there is an issue with merge being shallow. investigate how serious. (several calls to init may not behave as expected).
         modulus.config = merge(defaults, settings);
         modulus.config._findAndRegisterModules();
         modulus.config._initAutoInitModules();
         var end = new Date().getTime();
-        var total = end -start;
+        var total = end-start;
         log('modulus initialized in %s ms', total);
     };
 
+    modulus.reset = function(){
+        defaults._modules = {};
+    };
     /**
      * Allows you to get module dependencies for the passed in anonymous function.
      * e.g.
