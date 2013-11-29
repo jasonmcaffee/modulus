@@ -1,4 +1,4 @@
-function testOneController(core, log, TestOneView, TestOneModel){
+m(function testOneController(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
         action:function(){
@@ -14,4 +14,4 @@ function testOneController(core, log, TestOneView, TestOneModel){
             this.testOneModel.set({renderSomething:true});
         }
     };
-}
+});

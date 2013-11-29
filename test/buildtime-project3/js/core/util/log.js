@@ -1,4 +1,4 @@
-function log(){
+m(function log(){
     var log = function(){
         if(window.console && window.console.log){
             console.log.apply(console, arguments);
@@ -6,4 +6,4 @@ function log(){
     }
     log('log module loaded');
     return log;
-}
+});

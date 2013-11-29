@@ -1,19 +1,16 @@
-function pageOne(global, core, testOneController){
+m(function pageOne(global, core, testOneController){
     core.log('pageOne module loaded');
     testOneController.action();
-}
-//start this module when modulus init is called.
-pageOne.module = {
-    autoInit: true
-};
-function TestOneModel(log, Model){
+},{autoInit:true});
+
+m(function TestOneModel(log, Model){
     log('testOneModel module loaded');
     var TestOneModel = Model.extend({
 
     });
     return TestOneModel;
-}
-function TestOneView(View, $, core, log){
+});
+m(function TestOneView(View, $, core, log){
     log('TestOneView module loaded');
 
     return View.extend({
@@ -30,8 +27,8 @@ function TestOneView(View, $, core, log){
             $(this.el).html('Test One View Successfully Rendered Here');
         }
     });
-}
-function testOneController(core, log, TestOneView, TestOneModel){
+});
+m(function testOneController(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
         action:function(){
@@ -47,4 +44,4 @@ function testOneController(core, log, TestOneView, TestOneModel){
             this.testOneModel.set({renderSomething:true});
         }
     };
-}
+});

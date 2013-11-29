@@ -1,4 +1,4 @@
-function Controller(log){
+m(function Controller(log){
     log('Controller module loaded');
     function Controller(){
         core.log('creating new instance of Controller');
@@ -10,4 +10,4 @@ function Controller(log){
         }
     };
     return Controller;
-}
+});

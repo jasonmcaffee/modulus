@@ -1,4 +1,4 @@
-function TestOneView(View, $, core, log){
+m(function TestOneView(View, $, core, log){
     log('TestOneView module loaded');
 
     return View.extend({
@@ -15,4 +15,4 @@ function TestOneView(View, $, core, log){
             $(this.el).html('Test One View Successfully Rendered Here');
         }
     });
-}
+});

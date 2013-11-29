@@ -59,7 +59,8 @@ describe("modulus", function(){
         });
 
         //define
-        m(function mModuleB(){
+        m(function mModuleB($){
+            expect($.fn.jquery).toEqual('1.10.2');
             return {
                 prop1: 'a'
             };

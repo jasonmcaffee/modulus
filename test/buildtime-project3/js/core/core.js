@@ -1,4 +1,4 @@
-function core(log, Model, View, Controller){
+m(function core(log, Model, View, Controller){
     log('core module loaded');
 
     var core = {
@@ -6,4 +6,4 @@ function core(log, Model, View, Controller){
     };
 
     return core;
-}
+});

@@ -23,7 +23,7 @@ module.exports = function(grunt){
                 files:{
                     './dist/test/buildtime-project3/pageOne.js':{
                         dependencies:['pageOne'], //start at module b and include all it's dependencies.
-                        excludes:['global'] //todo: for pages that have a global.js and a page.js
+                        excludes:['global']
                     },
                     './dist/test/buildtime-project3/global.js':{
                         dependencies:['global']
