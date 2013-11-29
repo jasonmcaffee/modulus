@@ -31,7 +31,7 @@ function moduleB(moduleA){
 
 ```
 ### But wait, there's more!
-Modules provides several ways of defining modules.
+Modulus provides several ways of defining modules.
 
 #### via the m function
 the m function (aka modulus()) allows you to define and require modules.
