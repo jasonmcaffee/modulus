@@ -173,11 +173,12 @@
          * @param force - if the func does not have metadata, we don't do anything with it, unless force is true.
          * @returns {{name: *, paths: *, dependencies: *, resolvedDeps: undefined, autoInit: *, init: *, isInitialized: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
          */
-        _createModuleFromFunction: function(func, force){
+        _createModuleFromFunction: function(modulePartial, force){
             log('_createModuleFromFunction called');
+            var func = modulePartial.func;
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
-            var moduleName = moduleMeta.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
+            var moduleName = moduleMeta.name || modulePartial.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
             log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
@@ -221,10 +222,9 @@
                 try{//Unsafe JavaScript attempt to access frame with URL
                     var potential = context[key];
                     if(this._isModule(potential, context, key)){ //
-                        //do not modify this!!!!!! this is all global functions potentially!
-                        potential.module = potential.module || {};
-                        potential.module.name =  key;  //todo: allow for existing meta name. function moduleA(){}  moduleA.module={name:'whatever'}
-                        foundModuleFunctions.push(potential);
+                        //do not modify the potential!!!!!! this is all global functions potentially!
+                        var modulePartial = {name:key, func:potential}; //todo: allow for existing meta name. function moduleA(){}  moduleA.module={name:'whatever'}
+                        foundModuleFunctions.push(modulePartial);
                     }
                 }catch(e){
                 }
@@ -319,24 +319,7 @@
         var total = end -start;
         log('modulus initialized in %s ms', total);
     };
-    /**
-     * Optional function which should be used with start, and not used with init.
-     * Useful if you are being cautious of overriding third party global variables.
-     * @param settings - optional configuration
-     */
-    modulus.register = function(settings){
-        modulus.config = merge(defaults, settings);
-        modulus.config._findAndRegisterModules();
-    };
-    /**
-     * Optional function which should be used with start, and not used with init.
-     * Useful if you are being cautious of overriding third party global variables.
-     * @param settings - optional configuration which will get merged with the current this.config
-     */
-    modulus.start = function(settings){
-        modulus.config = merge(this.config, settings);
-        modulus.config._initAutoInitModules();
-    };
+
     /**
      * Allows you to get module dependencies for the passed in anonymous function.
      * e.g.
@@ -345,7 +328,7 @@
      * @param callback
      */
     modulus.require = function(callback){
-        var module = this.config._createModuleFromFunction(callback, true);
+        var module = this.config._createModuleFromFunction({key:callback.name, func:callback}, true);
         this.config._initModule(module);
     };
 
@@ -353,7 +336,24 @@
     modulusContext.m = modulusContext.modulus = modulus;
 })(window);
 
-
+///**
+// * Optional function which should be used with start, and not used with init.
+// * Useful if you are being cautious of overriding third party global variables.
+// * @param settings - optional configuration
+// */
+//modulus.register = function(settings){
+//    modulus.config = merge(defaults, settings);
+//    modulus.config._findAndRegisterModules();
+//};
+///**
+// * Optional function which should be used with start, and not used with init.
+// * Useful if you are being cautious of overriding third party global variables.
+// * @param settings - optional configuration which will get merged with the current this.config
+// */
+//modulus.start = function(settings){
+//    modulus.config = merge(this.config, settings);
+//    modulus.config._initAutoInitModules();
+//};
 
 ///**
 // * The modulus.
