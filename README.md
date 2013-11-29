@@ -304,6 +304,20 @@ modulus.init({
    }
 });
 ```
+
+## Build time API
+### Install
+```
+npm install modulusjs
+```
+### Build
+Take a look at the [grunt-tasks/test](grunt-tasks/test) dir for modulus build usages.
+```javascript
+var modulus = require('modulusjs');
+modulus.build({
+    ...
+}, buildComplete, buildFailure);
+```
 ##Contribute!
 Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
 Setup is super simple.
