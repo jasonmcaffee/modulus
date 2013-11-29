@@ -228,7 +228,12 @@ modulus.register();
 (function(){jquery stuff})()
 modulus.init();
 ```
-
+####I'm still scared
+You can also prefix your module names
+```javascript
+function $moduleA($moduleB){}
+function $moduleB(){}
+```
 #### But I don't like global functions!
 Fine
 ```javascript
@@ -237,6 +242,23 @@ namespace.moduleA = function(moduleB){};
 namespace.moduleB = function(){};
 
 modulus.init({context: namespace});
+```
+
+### I want my own module syntax!
+All functions in modulus are granular and overridable, which means you can define your modules in any way you see fit.
+```javascript
+modulus.init({
+   /**
+    * Iterates over every function defined in the specified context and determines if it should be considered
+    * a module. Currently this requires the function have a 'module' property assigned to it, but that may change.
+    * @param context - context which will be searched for potential module functions
+    * @returns {Array} - array of module functions
+    */
+   _findModuleFunctions: function(context){
+        //any custom logic you want to find your module functions
+        return [array, of, functions];
+   }
+});
 ```
 ##Contribute!
 Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
