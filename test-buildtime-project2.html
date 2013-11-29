@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Modulus Tests</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="test/vendor/jasmine.css">
+
+</head>
+<body>
+
+<h1>
+    Buildtime Project 2 Modulus Tests
+</h1>
+<h3>
+    These tests test the built modulus functionality.
+</h3>
+<div id="testDiv">
+    <div id="testViewDiv">
+        <h4>FAILURE TO EXECUTE TEST PROJECT VIEW</h4>
+    </div>
+</div>
+
+<!-- testing library -->
+<script src="test/vendor/jasmine.js"></script>
+<script src="test/vendor/jasmine-html.js"></script>
+
+<!-- your source libs here -->
+<script src="src/modulus/modulus.js"></script>
+<script src="dist/test/buildtime-project2/global.js"></script>
+<script src="dist/test/buildtime-project2/pageOne.js"></script>
+
+<!-- your specs -->
+<script src="test/buildtime-project2/buildtime-spec.js"></script>
+
+<!-- start the tests -->
+<script>
+    var env = jasmine.getEnv();
+    env.addReporter(new jasmine.HtmlReporter());
+    env.execute();
+</script>
+</body>
+</html>

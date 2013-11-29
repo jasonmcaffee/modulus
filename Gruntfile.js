@@ -63,7 +63,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.loadTasks('grunt-tasks/test/buildtime-project');
-
+    grunt.loadTasks('grunt-tasks/test/buildtime-project2');
 //    grunt.registerTask('test', ['jasmine']);
 //    grunt.registerTask('build', ['', 'jasmine:modulus']);
 //    grunt.registerTask('build-and-minify', ['build', 'uglify:modulus']);
