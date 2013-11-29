@@ -12,8 +12,8 @@ module.exports = function(grunt){
             grunt.fail.fatal(errors);
             done(true);
         }
-        //var modulus = require('modulusjs');
-        var modulus = require('../../../lib/modulus');
+        var modulus = require('modulusjs');
+        //var modulus = require('../../../lib/modulus');
 
         modulus.build({
             //the directory which should be scanned to find modules

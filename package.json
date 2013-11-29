@@ -2,13 +2,13 @@
     "author": "Jason McAffee",
     "name": "modulusjs",
     "description": "drop dead simple module definition library",
-    "version": "0.0.2",
+    "version": "0.0.4",
     "homepage": "http://github.com/jasonmcaffee/modulus",
     "repository": {
         "type": "git",
         "url": "https://github.com/jasonmcaffee/modulus.git"
     },
-    "bin": {"pound":"bin/modulus.js"},
+    "bin": {"modulusjs":"bin/modulus.js"},
     "main": "lib/modulus.js",
     "dependencies": {
         "glob":"3.2.7",
@@ -20,7 +20,7 @@
         "grunt-contrib-uglify": "0.2.4",
         "grunt": "0.4.1",
         "handlebars": "1.0.12",
-        "modulusjs":">0.0.1"
+        "modulusjs":"0.0.4"
     },
     "optionalDependencies": {},
     "engines": {
