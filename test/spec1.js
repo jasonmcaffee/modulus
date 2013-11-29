@@ -46,6 +46,32 @@ describe("modulus", function(){
 
         expect(callbackExecuted).toEqual(true);
     });
+
+    it("should not retain old configurations when init is called", function(){
+        var count = 0, wasCalled = false;
+        function shouldNotBeCalledMoreThanOnce(){
+            wasCalled = true;
+            expect(++count).toEqual(1);
+        }
+
+        modulus.init({
+            _findAndRegisterModules:function (){
+                shouldNotBeCalledMoreThanOnce();
+                var foundModuleFunctions = this._findModuleFunctions();
+                var foundModules = this._createModulesFromFunctions(foundModuleFunctions);
+                if(this.shim){
+                    var shimModules = this._createModulesFromShim();
+                    foundModules = shimModules.concat(foundModules);//foundModules.concat(shimModules);
+                }
+                this._registerModules(foundModules);
+            }
+        });
+
+        modulus.init({});
+
+        expect(wasCalled).toEqual(true);
+        expect(count).toEqual(1);
+    });
 });
 
 describe("modulus - internal", function(){
