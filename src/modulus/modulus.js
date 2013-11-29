@@ -214,7 +214,7 @@
 
         /**
          * Iterates over every function defined in the specified context and determines if it should be considered
-         * a module. Currently this requires the function have a 'module' property assigned to it, but that may change.
+         * a module.
          * @param context - context which will be searched for potential module functions
          * @returns {Array} - array of module functions
          */
