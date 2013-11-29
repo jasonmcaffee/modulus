@@ -222,7 +222,7 @@
                     var potential = context[key];
                     if(this._isModule(potential, context, key)){ //
                         potential.module = potential.module || {};
-                        potential.module.name = key;
+                        potential.module.name = potential.module.name || key;
                         foundModuleFunctions.push(potential);
                     }
                 }catch(e){
@@ -301,7 +301,7 @@
     /**
      * The modulus.
      */
-    function modulus(){
+    function modulus(func){
 
     }
     /**
