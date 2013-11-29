@@ -312,6 +312,7 @@
      */
     modulus.init = function(settings){
         var start = new Date().getTime();
+        defaults._modules = {};//todo: there is an issue with merge being shallow. investigate how serious. (several calls to init may not behave as expected).
         modulus.config = merge(defaults, settings);
         modulus.config._findAndRegisterModules();
         modulus.config._initAutoInitModules();
@@ -328,8 +329,8 @@
      * @param callback
      */
     modulus.require = function(callback){
-        var module = this.config._createModuleFromFunction({key:callback.name, func:callback}, true);
-        this.config._initModule(module);
+        var module = modulus.config._createModuleFromFunction({key:callback.name, func:callback}, true);
+        modulus.config._initModule(module);
     };
 
     //assign modulus to the global scope.
