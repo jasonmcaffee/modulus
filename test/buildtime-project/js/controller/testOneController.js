@@ -3,6 +3,8 @@ function testOneController(core, log, TestOneView, TestOneModel){
     return {
         action:function(){
             log('testOneController action called');
+            this.testOneView = new TestOneView();
+            this.testOneView.render();
         }
     };
 }
