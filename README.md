@@ -30,6 +30,42 @@ function moduleB(moduleA){
 }
 
 ```
+### But wait, there's more!
+Modules provides several ways of defining modules.
+
+#### via the m function
+the m function (aka modulus()) allows you to define and require modules.
+This is a good option when you have a large project and are worried about global functions getting overridden.
+```javascript
+//define by passing in named function
+m(function moduleA(){
+    return {prop1: 123};
+});
+
+//require by passing in non-named function
+m(function(moduleA){
+    console.log(moduleA.prop1);
+});
+```
+
+#### via a context object
+You can define all of your modules as properties of a context
+```javascript
+var ns = {};
+ns.moduleB = function(){
+    return {
+        prop1: 123
+    };
+};
+
+ns.moduleB = function(moduleA){
+    return {
+        prop1: moduleA.prop1 + 1
+    };
+};
+
+modulus.init({context:ns});
+```
 
 ##Start Processing
 
@@ -46,11 +82,19 @@ moduleB.module = {
 //start processing
 modulus.init();
 ```
-
-### Option 2
+### Through the m function
 ```javascript
-modulus.init();
+//require alias
+m(function(moduleB){
+    //immediately executed
+});
+m(function(moduleB){
+    //invoked once modulus.init() is called.
+}, {autoInit:true});
+```
 
+### Through the modulus.require function
+```javascript
 modulus.require(function (moduleB){
     console.log(moduleB.prop1); //prints 124
 });
