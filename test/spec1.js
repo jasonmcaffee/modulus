@@ -49,24 +49,39 @@ describe("modulus", function(){
 
     it("should provide a single function for require and define", function(){
         var called = false;
-        m.init();
+        m.reset();
+
         //define
         m(function mModuleA(){
             return {
                 prop1: 123
             };
         });
+
+        //define
         m(function mModuleB(){
             return {
                 prop1: 'a'
             };
         });
 
+        //init must be called before any requires are.
+        m.init({
+            shim:{
+                '$':{
+                    dependencies:[],
+                    exports: '$'
+                }
+            },
+            context: null //dont try to find any other modules
+        });
+
         //require
-        m(function(mModuleA, mModuleB){
+        m(function(mModuleA, mModuleB, $){
             called = true;
             expect(mModuleA.prop1).toEqual(123);
             expect(mModuleB.prop1).toEqual('a');
+            expect($.fn.jquery).toEqual('1.10.2');
         });
 
         expect(called).toEqual(true);

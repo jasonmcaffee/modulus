@@ -338,7 +338,7 @@
     };
 
     modulus.reset = function(){
-        defaults._modules = {};
+        modulus.config._modules = defaults._modules = {};
     };
     /**
      * Allows you to get module dependencies for the passed in anonymous function.
