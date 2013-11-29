@@ -308,11 +308,18 @@
      * If you pass in a unnamed function, it will act as require, and the function will be executed immediately and passed its dependencies.
      */
     function modulus(func, metadata){
+        if(metadata){func.module = metadata;}
+        var module = modulus.config._createModuleFromFunction({key:func.name, func:func}, true);
+
         if(func.name){
-
+            modulus.config._registerModule(module);
+            if(module.module && module.module.autoInit){  //immediately init if specified?
+                modulus.config._initModule(module);
+            }
         }else{
-
+            modulus.config._initModule(module);
         }
+
     }
     /**
      * Starting point for modulus.
@@ -344,6 +351,8 @@
         var module = modulus.config._createModuleFromFunction({key:callback.name, func:callback}, true);
         modulus.config._initModule(module);
     };
+
+    modulus.config = defaults; //allow modulus function to be called before init is called.
 
     //assign modulus to the global scope.
     modulusContext.m = modulusContext.modulus = modulus;

@@ -47,6 +47,31 @@ describe("modulus", function(){
         expect(callbackExecuted).toEqual(true);
     });
 
+    it("should provide a single function for require and define", function(){
+        var called = false;
+        m.init();
+        //define
+        m(function mModuleA(){
+            return {
+                prop1: 123
+            };
+        });
+        m(function mModuleB(){
+            return {
+                prop1: 'a'
+            };
+        });
+
+        //require
+        m(function(mModuleA, mModuleB){
+            called = true;
+            expect(mModuleA.prop1).toEqual(123);
+            expect(mModuleB.prop1).toEqual('a');
+        });
+
+        expect(called).toEqual(true);
+    });
+
     it("should not retain old configurations when init is called", function(){
         var count = 0, wasCalled = false;
         function shouldNotBeCalledMoreThanOnce(){
