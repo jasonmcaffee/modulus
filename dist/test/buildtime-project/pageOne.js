@@ -13,21 +13,23 @@ function TestOneModel(log, Model){
     });
     return TestOneModel;
 }
-function testOneView(Backbone, $, core, log){
-    log('testOneView module loaded');
+function TestOneView(View, $, core, log){
+    log('TestOneView module loaded');
 
-    return {
-        testOneView: true
-    };
+    return View.extend({
+        render:function(){
+
+        }
+    });
 }
 function global(core, $){
     core.log('global module loaded');
 }
-function testOneController(core, TestOneView, TestOneModel){
-    core.log('testOneController module loaded');
+function testOneController(core, log, TestOneView, TestOneModel){
+    log('testOneController module loaded');
     return {
         action:function(){
-
+            log('testOneController action called');
         }
     };
 }

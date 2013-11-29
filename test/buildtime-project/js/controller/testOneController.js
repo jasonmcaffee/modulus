@@ -1,8 +1,8 @@
-function testOneController(core, TestOneView, TestOneModel){
-    core.log('testOneController module loaded');
+function testOneController(core, log, TestOneView, TestOneModel){
+    log('testOneController module loaded');
     return {
         action:function(){
-
+            log('testOneController action called');
         }
     };
 }

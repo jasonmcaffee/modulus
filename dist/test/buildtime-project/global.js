@@ -46,6 +46,9 @@ function Model(log, Backbone){
 }
 function View(log, Backbone){
     log('View module loaded');
+    return Backbone.View.extend({
+
+    });
 
 }
 function core(log, Model, View, Controller){
