@@ -221,8 +221,9 @@
                 try{//Unsafe JavaScript attempt to access frame with URL
                     var potential = context[key];
                     if(this._isModule(potential, context, key)){ //
+                        //do not modify this!!!!!! this is all global functions potentially!
                         potential.module = potential.module || {};
-                        potential.module.name = potential.module.name || key;
+                        potential.module.name =  key;  //todo: allow for existing meta name. function moduleA(){}  moduleA.module={name:'whatever'}
                         foundModuleFunctions.push(potential);
                     }
                 }catch(e){
