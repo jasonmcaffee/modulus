@@ -1,4 +1,4 @@
-function core(log){
+function core(log, Model, View, Controller){
     log('core module loaded');
 
     var core = {

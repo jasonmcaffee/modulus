@@ -1,5 +1,5 @@
-function Model(core, Backbone){
-    core.log('Model module loaded');
+function Model(log, Backbone){
+    log('Model module loaded');
     var Model = Backbone.Model.extend({
 
     });

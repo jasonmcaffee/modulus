@@ -4,6 +4,6 @@ function log(){
             console.log.apply(console, arguments);
         }
     }
-
+    log('log module loaded');
     return log;
 }

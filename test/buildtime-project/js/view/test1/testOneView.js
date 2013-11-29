@@ -1,5 +1,5 @@
-function testOneView(Backbone, $, core, testOneModel){
-    core.log('testOneView module loaded');
+function testOneView(Backbone, $, core, log){
+    log('testOneView module loaded');
 
     return {
         testOneView: true

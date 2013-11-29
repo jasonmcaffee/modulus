@@ -18,7 +18,7 @@
     }
 
     function log(){
-        //return;
+        return;
         if(window.console && window.console.log){
             console.log.apply(console, arguments);
         }
@@ -142,6 +142,7 @@
             var matches = reg.exec(funcString);//funcString.match(reg)[0];
             var paramsAsString = matches? matches[1] : '';
             paramsAsString = paramsAsString.replace(/\s/g, '');
+            if(paramsAsString == ''){return [];} //issue with [''] used as dependencies
             var dependencies = paramsAsString.split(',');
             return dependencies;
         },

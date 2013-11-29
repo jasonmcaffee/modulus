@@ -1,4 +1,7 @@
-function View(core, Backbone){
-    core.log('View module loaded');
+function View(log, Backbone){
+    log('View module loaded');
+    return Backbone.view.extend({
+
+    });
 
 }
