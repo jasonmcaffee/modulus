@@ -3,8 +3,15 @@ function testOneController(core, log, TestOneView, TestOneModel){
     return {
         action:function(){
             log('testOneController action called');
-            this.testOneView = new TestOneView();
+
+            this.testOneModel = new TestOneModel();
+            this.testOneView = new TestOneView({model:this.testOneModel});
+
+            //render to the testOneDiv
             this.testOneView.render();
+
+            //trigger a model change which the view listens for and renders to the page again.
+            this.testOneModel.set({renderSomething:true});
         }
     };
 }
