@@ -313,11 +313,18 @@
 
         if(func.name){
             modulus.config._registerModule(module);
-            if(module.module && module.module.autoInit){  //immediately init if specified?
+//            if(module.module && module.module.autoInit){
+//                //modulus.config._initModule(module);  add to queue.
+//            }
+        }else{
+            //modulus.config._initModule(module);
+            if(!func.module || (func.module && !func.module.autoInit)){  //if autoInit is specified, wait until modulus.init is called.
                 modulus.config._initModule(module);
             }
-        }else{
-            modulus.config._initModule(module);
+            if(func.module && func.module.autoInit){
+                modulus.anonymousInitQueue = modulus.anonymousInitQueue || [];
+                modulus.anonymousInitQueue.push(module);
+            }
         }
 
     }
@@ -328,15 +335,24 @@
      */
     modulus.init = function(settings){
         var start = new Date().getTime();
-        //defaults._modules = {};//todo: there is an issue with merge being shallow. investigate how serious. (several calls to init may not behave as expected).
         modulus.config = merge(defaults, settings);
         modulus.config._findAndRegisterModules();
         modulus.config._initAutoInitModules();
+        if(modulus.anonymousInitQueue){
+            for(var i=0;i<modulus.anonymousInitQueue.length;++i){
+                var anonModule = modulus.anonymousInitQueue[i];
+                modulus.config._initModule(anonModule);
+            }
+            modulus.anonymousInitQueue=[];
+        }
         var end = new Date().getTime();
         var total = end-start;
         log('modulus initialized in %s ms', total);
     };
 
+    /**
+     * Destroys all registered modules. Useful for unit testing
+     */
     modulus.reset = function(){
         modulus.config._modules = defaults._modules = {};
     };
@@ -344,12 +360,12 @@
      * Allows you to get module dependencies for the passed in anonymous function.
      * e.g.
      * modulus.require(function (moduleA, moduleB){...});
+     * modulus.define(function myModule(moduleX){...});
      * would resolve moduleA and moduleB
      * @param callback
      */
-    modulus.require = function(callback){
-        var module = modulus.config._createModuleFromFunction({key:callback.name, func:callback}, true);
-        modulus.config._initModule(module);
+    modulus.require = modulus.define = function(func, metadata){
+        return modulus(func, metadata);
     };
 
     modulus.config = defaults; //allow modulus function to be called before init is called.
@@ -357,73 +373,3 @@
     //assign modulus to the global scope.
     modulusContext.m = modulusContext.modulus = modulus;
 })(window);
-
-///**
-// * Optional function which should be used with start, and not used with init.
-// * Useful if you are being cautious of overriding third party global variables.
-// * @param settings - optional configuration
-// */
-//modulus.register = function(settings){
-//    modulus.config = merge(defaults, settings);
-//    modulus.config._findAndRegisterModules();
-//};
-///**
-// * Optional function which should be used with start, and not used with init.
-// * Useful if you are being cautious of overriding third party global variables.
-// * @param settings - optional configuration which will get merged with the current this.config
-// */
-//modulus.start = function(settings){
-//    modulus.config = merge(this.config, settings);
-//    modulus.config._initAutoInitModules();
-//};
-
-///**
-// * The modulus.
-// */
-//var modulus = {
-//    /**
-//     * Starting point for modulus.
-//     * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
-//     * with metadata autoInit = true.
-//     */
-//    init:function(settings){
-//        var start = new Date().getTime();
-//        this.config = merge(defaults, settings);
-//        this.config._findAndRegisterModules();
-//        this.config._initAutoInitModules();
-//        var end = new Date().getTime();
-//        var total = end -start;
-//        log('modulus initialized in %s ms', total);
-//    },
-//
-//    /**
-//     * Optional function which should be used with start, and not used with init.
-//     * Useful if you are being cautious of overriding third party global variables.
-//     * @param settings - optional configuration
-//     */
-//    register:function(settings){
-//        this.config = merge(defaults, settings);
-//        this.config._findAndRegisterModules();
-//    },
-//
-//    /**
-//     * Optional function which should be used with start, and not used with init.
-//     * Useful if you are being cautious of overriding third party global variables.
-//     * @param settings - optional configuration which will get merged with the current this.config
-//     */
-//    start:function(settings){
-//        this.config = merge(this.config, settings);
-//        this.config._initAutoInitModules();
-//    },
-//    /**
-//     * Allows you to get module dependencies for the passed in anonymous function.
-//     * e.g.
-//     * modulus.require(function (moduleA, moduleB){...});
-//     * would resolve moduleA and moduleB
-//     * @param callback
-//     */
-//    require:function(callback){
-//        var module = this.config._createModuleFromFunction(callback, true);
-//        this.config._initModule(module);
-//    }
-//};

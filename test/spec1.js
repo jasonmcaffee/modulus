@@ -2,10 +2,10 @@ describe("modulus", function(){
 
 
     //you can explicitly call require when needed or preferred.
-    it("should support a require function which resolves dependencies", function(){
+    it("should support a require function which immediately resolves dependencies", function(){
         var callbackExecuted = false;
         modulus.init();
-        modulus.require(function anon(moduleA, moduleB, moduleC){
+        modulus.require(function(moduleA, moduleB, moduleC){
             callbackExecuted = true;
             expect(moduleA.prop1).toEqual(123);
             expect(moduleA.moduleB).toEqual(moduleB);
@@ -16,15 +16,46 @@ describe("modulus", function(){
         
         expect(callbackExecuted).toEqual(true);
     });
+
+    it("should support a require function which allows autoinit metadata so that the passed in function isn't executed until modulus.init is called", function(){
+        var callbackExecuted = false;
+
+        modulus.require(function(moduleA, moduleB, moduleC){
+            callbackExecuted = true;
+            expect(moduleA.prop1).toEqual(123);
+            expect(moduleA.moduleB).toEqual(moduleB);
+            expect(moduleB.b).toEqual('this i b');
+            expect(moduleC).toEqual(1);
+            expect(moduleB.moduleC).toEqual(moduleC);
+        }, {autoInit:true});
+
+        expect(callbackExecuted).toEqual(false);
+
+        modulus.init();
+
+        expect(callbackExecuted).toEqual(true);
+    });
+
+    it("should support a define function", function(){
+        modulus.reset();
+        var called = false;
+        modulus.define(function dModuleA(){
+            called = true;
+            return {propA:123};
+        }, {autoInit:true});
+
+        modulus.init();
+        expect(called).toEqual(true);
+    });
     
     it("should only call a module's init once", function(){
         modulus.init();
         modulus.require(function(moduleC){
-            expect(moduleC).toEqual(1); //since we call init again, count is 2 at this point
+            expect(moduleC).toEqual(2); //since we call init again, count is 2 at this point
         });
         
         modulus.require(function(moduleC){
-            expect(moduleC).toEqual(1);
+            expect(moduleC).toEqual(2);
         }); 
     });
 
