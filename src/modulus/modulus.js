@@ -25,12 +25,7 @@
     }
 
     var defaults = {
-//        shim:{
-//            '$':{
-//                dependencies:[],
-//                exports:'$'
-//            }
-//        },
+        context: modulusContext, //by default we use the window for the context. e.g. function moduleA(){} ends up on the window.
         _modules: {
 //             'moduleX':{
 //                 name: moduleMeta.name,
@@ -220,17 +215,15 @@
          */
         _findModuleFunctions: function(context){
             var foundModuleFunctions = [];
-            context = context || modulusContext;
+            context = context || this.context;
             for(var key in context){ //look through every function in context to see if its a module
-                if(context.hasOwnProperty(key)){
-                    //log('context is ' + context + ' key: ' + key);
-                    try{//Unsafe JavaScript attempt to access frame with URL
-                        var potential = context[key];
-                        if(this._isModule(potential, context, key)){ //
-                            foundModuleFunctions.push(potential);
-                        }
-                    }catch(e){
+                //log('context is ' + context + ' key: ' + key);
+                try{//Unsafe JavaScript attempt to access frame with URL
+                    var potential = context[key];
+                    if(this._isModule(potential, context, key)){ //
+                        foundModuleFunctions.push(potential);
                     }
+                }catch(e){
                 }
             }
             //log('foundModuleFunctions: ' + foundModuleFunctions);
@@ -246,7 +239,7 @@
          */
         _isModule: function(val, context, key){
             var isModule = false;
-            if(typeof val === "function"){ //  //&& val.module
+            if(context.hasOwnProperty(key) && typeof val === "function"){
                 isModule = true;
             }
             return isModule;
@@ -322,9 +315,24 @@
             log('modulus initialized in %s ms', total);
         },
 
+        /**
+         * Optional function which should be used with start, and not used with init.
+         * Useful if you are being cautious of overriding third party global variables.
+         * @param settings - optional configuration
+         */
         register:function(settings){
             this.config = merge(defaults, settings);
             this.config._findAndRegisterModules();
+        },
+
+        /**
+         * Optional function which should be used with start, and not used with init.
+         * Useful if you are being cautious of overriding third party global variables.
+         * @param settings - optional configuration which will get merged with the current this.config
+         */
+        start:function(settings){
+            this.config = merge(this.config, settings);
+            this.config._initAutoInitModules();
         },
         /**
          * Allows you to get module dependencies for the passed in anonymous function.
