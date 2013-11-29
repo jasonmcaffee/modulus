@@ -177,7 +177,7 @@
             log('_createModuleFromFunction called');
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
-            var moduleName = moduleMeta.name || func.name;//explict overrides allowed. default is to use the function name.
+            var moduleName = moduleMeta.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
             log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
@@ -221,6 +221,8 @@
                 try{//Unsafe JavaScript attempt to access frame with URL
                     var potential = context[key];
                     if(this._isModule(potential, context, key)){ //
+                        potential.module = potential.module || {};
+                        potential.module.name = key;
                         foundModuleFunctions.push(potential);
                     }
                 }catch(e){

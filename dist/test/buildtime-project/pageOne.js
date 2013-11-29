@@ -31,9 +31,6 @@ function TestOneView(View, $, core, log){
         }
     });
 }
-function global(core, Backbone){
-    core.log('global module loaded');
-}
 function testOneController(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
