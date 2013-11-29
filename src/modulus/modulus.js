@@ -301,54 +301,106 @@
     /**
      * The modulus.
      */
-    var modulus = {
-        /**
-         * Starting point for modulus.
-         * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
-         * with metadata autoInit = true.
-         */
-        init:function(settings){
-            var start = new Date().getTime();
-            this.config = merge(defaults, settings);
-            this.config._findAndRegisterModules();
-            this.config._initAutoInitModules();
-            var end = new Date().getTime();
-            var total = end -start;
-            log('modulus initialized in %s ms', total);
-        },
+    function modulus(){
 
-        /**
-         * Optional function which should be used with start, and not used with init.
-         * Useful if you are being cautious of overriding third party global variables.
-         * @param settings - optional configuration
-         */
-        register:function(settings){
-            this.config = merge(defaults, settings);
-            this.config._findAndRegisterModules();
-        },
-
-        /**
-         * Optional function which should be used with start, and not used with init.
-         * Useful if you are being cautious of overriding third party global variables.
-         * @param settings - optional configuration which will get merged with the current this.config
-         */
-        start:function(settings){
-            this.config = merge(this.config, settings);
-            this.config._initAutoInitModules();
-        },
-        /**
-         * Allows you to get module dependencies for the passed in anonymous function.
-         * e.g.
-         * modulus.require(function (moduleA, moduleB){...});
-         * would resolve moduleA and moduleB
-         * @param callback
-         */
-        require:function(callback){
-            var module = this.config._createModuleFromFunction(callback, true);
-            this.config._initModule(module);
-        }
+    }
+    /**
+     * Starting point for modulus.
+     * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
+     * with metadata autoInit = true.
+     */
+    modulus.init = function(settings){
+        var start = new Date().getTime();
+        modulus.config = merge(defaults, settings);
+        modulus.config._findAndRegisterModules();
+        modulus.config._initAutoInitModules();
+        var end = new Date().getTime();
+        var total = end -start;
+        log('modulus initialized in %s ms', total);
+    };
+    /**
+     * Optional function which should be used with start, and not used with init.
+     * Useful if you are being cautious of overriding third party global variables.
+     * @param settings - optional configuration
+     */
+    modulus.register = function(settings){
+        modulus.config = merge(defaults, settings);
+        modulus.config._findAndRegisterModules();
+    };
+    /**
+     * Optional function which should be used with start, and not used with init.
+     * Useful if you are being cautious of overriding third party global variables.
+     * @param settings - optional configuration which will get merged with the current this.config
+     */
+    modulus.start = function(settings){
+        modulus.config = merge(this.config, settings);
+        modulus.config._initAutoInitModules();
+    };
+    /**
+     * Allows you to get module dependencies for the passed in anonymous function.
+     * e.g.
+     * modulus.require(function (moduleA, moduleB){...});
+     * would resolve moduleA and moduleB
+     * @param callback
+     */
+    modulus.require = function(callback){
+        var module = this.config._createModuleFromFunction(callback, true);
+        this.config._initModule(module);
     };
 
     //assign modulus to the global scope.
-    modulusContext.modulus = modulus;
+    modulusContext.m = modulusContext.modulus = modulus;
 })(window);
+
+
+
+///**
+// * The modulus.
+// */
+//var modulus = {
+//    /**
+//     * Starting point for modulus.
+//     * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
+//     * with metadata autoInit = true.
+//     */
+//    init:function(settings){
+//        var start = new Date().getTime();
+//        this.config = merge(defaults, settings);
+//        this.config._findAndRegisterModules();
+//        this.config._initAutoInitModules();
+//        var end = new Date().getTime();
+//        var total = end -start;
+//        log('modulus initialized in %s ms', total);
+//    },
+//
+//    /**
+//     * Optional function which should be used with start, and not used with init.
+//     * Useful if you are being cautious of overriding third party global variables.
+//     * @param settings - optional configuration
+//     */
+//    register:function(settings){
+//        this.config = merge(defaults, settings);
+//        this.config._findAndRegisterModules();
+//    },
+//
+//    /**
+//     * Optional function which should be used with start, and not used with init.
+//     * Useful if you are being cautious of overriding third party global variables.
+//     * @param settings - optional configuration which will get merged with the current this.config
+//     */
+//    start:function(settings){
+//        this.config = merge(this.config, settings);
+//        this.config._initAutoInitModules();
+//    },
+//    /**
+//     * Allows you to get module dependencies for the passed in anonymous function.
+//     * e.g.
+//     * modulus.require(function (moduleA, moduleB){...});
+//     * would resolve moduleA and moduleB
+//     * @param callback
+//     */
+//    require:function(callback){
+//        var module = this.config._createModuleFromFunction(callback, true);
+//        this.config._initModule(module);
+//    }
+//};
