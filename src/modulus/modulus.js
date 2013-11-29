@@ -154,9 +154,9 @@
          */
         _registerModule: function(module){
             log('_registerModule called for module.name %s', module.name);
-            //if(!this._modules[module.name]){ //don't allow a module to be re-registered (protection from overrides)
+            if(!this._modules[module.name]){ //don't allow a module to be re-registered (protection from overrides)
                 this._modules[module.name] = module;
-           // }
+            }
         },
 
         /**
