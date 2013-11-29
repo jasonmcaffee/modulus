@@ -293,7 +293,7 @@
             var foundModules = this._createModulesFromFunctions(foundModuleFunctions);
             if(this.shim){
                 var shimModules = this._createModulesFromShim();
-                foundModules = foundModules.concat(shimModules);
+                foundModules = shimModules.concat(foundModules);//foundModules.concat(shimModules);
             }
             this._registerModules(foundModules);
         }
