@@ -99,10 +99,13 @@
                     }else{
                         module.isAsyncInProgress = true;
                         //divide and conquer. load the file and it's dependencies at the same time.
+
+                        //DON'T DO IT THIS WAY FOR SHIMs. Load the dependencies first. maybe don't ever do it this way.
                         this.asyncFileLoad(module.name, (function(module, config){
                             return function(){
                                 log('async load completed for %s completed', module.name);
-                                if(!module.areDependenciesLoading && module.dependencies && module.dependencies.length>0){
+
+                                if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
                                     log('async module %s loaded but has dependencies that were found after load.', module.name);
                                     config._loadModuleDependencies(module, function(module){
                                         module.asyncComplete = true;
@@ -117,6 +120,7 @@
                             }
                         })(module, this), errorback);
 
+                        //DON'T DO THIS. If backbone loads before it's dependency Underscore, there will be a script error.
                         //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
                         if(module.dependencies && module.dependencies.length > 0){
                             this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
@@ -154,7 +158,9 @@
                         module.isInitialized = true;
                     }else{
                         //todo: reregister all things now that the module is loaded. may need eval if shim.
-                        //todo: check if dependencies are resolved and call callback.
+//                        if(modulus.config.context == window){
+//                            modulus.config._findAndRegisterModules();
+//                        }
                         //run the module init
                         module.initResult = module.init.apply(undefined, module.resolvedDependencies);
                         module.isInitialized = true;
@@ -179,6 +185,7 @@
                 return function(resolvedDependencies){
                     module.resolvedDependencies = resolvedDependencies;
                     module.areDependenciesLoading = false;
+                    module.isDependencyLoadingComplete = true;
                     callback(module);
                 }
             })(module), function(error){
