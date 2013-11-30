@@ -103,6 +103,7 @@ modulus.require(function (moduleB){
 ## AMD
 Currently the AMD functionality resides in [src/modulus/modulusAsync](src/modulus/modulusAsynch.js)
 This will likely be merged with the non async version (src/modulus/modulus.js) soon.
+
 If you wish to asynchronously load modules, you will need to provide an asyncFileLoad function.
 
 Example Project can be found [here](test/async-loading).
@@ -111,7 +112,7 @@ Example Project can be found [here](test/async-loading).
 ### Example Implementation
 We can opt to create our own config entry which we can reference during asyncFileLoad.
 
-You can create any convention or configuration that you want.  asyncFileLoad's 'this' will be the config object.
+NOTE: You can create any convention or configuration that you want.  asyncFileLoad's 'this' will be the config object.
 ```javascript
 modulus.init({
     asyncMap:{
