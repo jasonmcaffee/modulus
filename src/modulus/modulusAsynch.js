@@ -38,7 +38,17 @@
 //                 context: moduleMeta.context //the 'this' for the module init
 //             }
         },
+        /**
+         * Hash of module names to 'path', where path can be any value you want to represent the file location.
+         * If you use this option, you must implement asyncFileLoad
+         * e.g. {'moduleName' : 'path/to/module'}
+         */
         asyncMap:{},
+        /**
+         * Define this if you wish to do AMD
+         * params, in order: (moduleName, callback, errorback)
+         */
+        asyncFileLoad: null,
 
         /**
          * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
@@ -62,6 +72,18 @@
             }
             return initModulesResults;
         },
+
+        /**
+         *
+         * @param totalLoaded
+         * @param totalToLoad
+         * @param initModulesCallback
+         * @param module
+         * @param initModulesResults
+         * @param index
+         * @returns {Function}
+         * @private
+         */
         _createInitModuleCallback:function(totalLoaded, totalToLoad, initModulesCallback, module, initModulesResults, index){
             return function(moduleInitResult){
                 //initModulesResults.push(moduleInitResult);
@@ -109,11 +131,13 @@
 
 
                         }else{
-                            //DON'T DO IT THIS WAY FOR SHIMs. Load the dependencies first. maybe don't ever do it this way.
+                            //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
                             this.asyncFileLoad(module.name, (function(module, config){
                                 return function(){
                                     log('async load completed for %s completed', module.name);
 
+                                    //we don't know the dependencies of a module until it has been loaded and registered.
+                                    //if the module does have dependencies
                                     if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
                                         log('async module %s loaded but has dependencies that were found after load.', module.name);
                                         config._loadModuleDependencies(module, function(module){
@@ -129,7 +153,6 @@
                                 }
                             })(module, this), errorback);
 
-                            //DON'T DO THIS. If backbone loads before it's dependency Underscore, there will be a script error.
                             //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
                             if(module.dependencies && module.dependencies.length > 0){
                                 this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);

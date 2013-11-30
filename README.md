@@ -101,37 +101,57 @@ modulus.require(function (moduleB){
 ```
 
 ## AMD
-No AMD support yet, but it'll probably look something like:
+If you wish to asynchronously load modules, you will need to provide an asyncFileLoad function.
+
+Example Project can be found [here](test/async-loading).
+[spec](test/async-loading/async-loading-spec.js)
+[test page](test-async-loading.html)
+### Example Implementation
+We can opt to create our own config entry which we can reference during asyncFileLoad.
+
+You can create any convention or configuration that you want.  asyncFileLoad's 'this' will be the config object.
 ```javascript
-function moduleA(asynchModuleB){
-}
-moduleA.module = {
-    params:{
-        asynchModuleB: 'http://www.example.com/js/moduleB.js'
-    }
-}
-```
-or
-```javascript
-modulus.config({
-    paths:{
-        'asynchModuleB':'http://www.example.com/js/moduleB.js'
+modulus.init({
+    asyncMap:{
+        'Controller':'core/mvc/Controller',
+        'Model':'core/mvc/Model',
+        'View': 'core/mvc/View',
+        'log': 'core/util/log',
+        'core': 'core/core',
+        'global': 'base/global',
+        'TestOneModel': 'model/test1/TestOneModel',
+        'pageOne': 'page/pageOne',
+        '$':'vendor/jquery-1.10.2.min',
+        'Backbone':'vendor/backbone-1.1.0.min',
+        '_': 'vendor/underscore-1.5.2.min',
+        'TestOneView': 'view/test1/TestOneView',
+        'testOneController':'controller/testOneController'
+    },
+    asyncFileLoad:function(moduleName, callback, errorback){
+        var root = 'test/buildtime-project3/js/';
+        var path = root+this.asyncMap[moduleName] + '.js'; //find the path by referencing the asyncMap
+        $.ajax({
+            url: path,
+            crossDomain:true, //allow local file system cross domain requests.
+            dataType: "script",
+            success: callback
+        }).fail(function(err){errorback(err)});
     }
 });
 ```
 
-You will probably also have to supply the async function:
-```javascript
-modulus.config({
-     asynchFileLoad: function(path, callback, errorback){
-         $.ajax({
-             url: path,
-             dataType: "script",
-             success: callback
-          }).fail(function(err){erroback(err)});
-     });
-});
-```
+### Async Loading Behavior
+Modulus attempts to load modules as quickly as possible by using this strategy:
+
+Modulus will attempt to asynchronously load any module that is not currently registered (i.e. in modulus.config._modules) when asyncFileLoad is defined.
+
+When you require a module asynchronously, the module will first be downloaded, and then it's dependencies will be downloaded simultaneously.
+
+When you require a module that has already been loaded, a new asyncFileLoad request will not be made.
+
+Shim entries that are asynchronously downloaded will have dependencies loaded first. (e.g. Backbone shouldn't be loaded until underscore is)
+
+Shim entry dependencies will be downloaded simultaneously. e.g. if you require Backbone, jquery and underscore will be loaded at the same time.
 
 ## Build Time Option
 If you choose to use the build time library, you have the option of using file names as module names instead of using the function name.
