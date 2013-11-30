@@ -82,41 +82,55 @@
         _initModule: function giveContext(module, callback, errorback){
             log('init called for module.name: %s', module.name);
             //if the module has already been initialized, return it's result
-            if(module.isInitialized){ return module.initResult; }
+            if(module.isInitialized){
+                callback(module.initResult);
+                return;
+            }
             try{
-                var resolvedDependencies = [];
+
+                module.asyncSuccessQueue = module.asyncSuccessQueue || [];
+                module.asyncSuccessQueue.push(callback);
+
                 if(module.isAsync){
-                    if(this.asyncFileLoad){
-                        this.asyncFileLoad(module.name, (function(module){
+                    if(!this.asyncFileLoad){ throw 'async module defined, but there is no asynFileLoad function provided. You must provide asyncFileLoad via init configuration';}
+
+                    if(module.isAsyncInProgress){
+
+                    }else{
+                        module.isAsyncInProgress = true;
+                        //divide and conquer. load the file and it's dependencies at the same time.
+                        this.asyncFileLoad(module.name, (function(module, config){
                             return function(){
                                 log('async load completed for %s completed', module.name);
-                                module.isInitialized = true;
+                                if(!module.areDependenciesLoading && module.dependencies && module.dependencies.length>0){
+                                    log('async module %s loaded but has dependencies that were found after load.', module.name);
+                                    config._loadModuleDependencies(module, function(module){
+                                        module.asyncComplete = true;
+                                        module.isAsyncInProgress = false;
+                                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                    });
+                                }else{
+                                    module.asyncComplete = true;
+                                    module.isAsyncInProgress = false;
+                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                }
                             }
-                        })(module), errorback);
-                    }else{
-                        throw 'async module defined, but there is no asynFileLoad function provided. You must provide asyncFileLoad via init configuration';
+                        })(module, this), errorback);
+
+                        //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
+                        if(module.dependencies && module.dependencies.length > 0){
+                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+                        }
                     }
+
                 }
                 //retrieve module metadata for the dependencies
                 else if(module.dependencies && module.dependencies.length > 0){
-                    var modules = this._getModules(module.dependencies);
-                    log('module.name: %s depends on modules %s', module.name, module.dependencies);
+                    this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading, errorback);
 
-                    //init all dependencies
-                    //resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
-                    this._initModules(modules, (function(module){
-                        return function(resolvedDependencies){
-                            //run the module init
-                            module.initResult = module.init.apply(undefined, resolvedDependencies);
-                            module.isInitialized = true;
-                            callback(module.initResult);
-                        }
-                    })(module), function(error){
-
-                    });
                 }else{
                     //run the module init
-                    module.initResult = module.init.apply(undefined, resolvedDependencies);
+                    module.initResult = module.init.apply(undefined, []);
                     module.isInitialized = true;
                     callback(module.initResult);
                 }
@@ -128,6 +142,48 @@
             }
 
             //return module.initResult;
+        },
+        //static function. should have no references to this.
+        _executeCallbacksIfModuleIsDoneLoading:function(module){
+            if(!module.isAsync ||(module.isAsync && module.asyncComplete)){
+                //if(module.dependencies.length == 0 || module.resolvedDependencies){
+                if(!module.areDependenciesLoading){
+                    //todo: is shim eval needed.
+                    if(module.isShim){
+                        module.initResult = eval(module.shimConfig.exports);
+                        module.isInitialized = true;
+                    }else{
+                        //todo: reregister all things now that the module is loaded. may need eval if shim.
+                        //todo: check if dependencies are resolved and call callback.
+                        //run the module init
+                        module.initResult = module.init.apply(undefined, module.resolvedDependencies);
+                        module.isInitialized = true;
+                    }
+
+                    for(var i=0; i<module.asyncSuccessQueue.length;++i){
+                        var cb = module.asyncSuccessQueue[i];
+                        cb(module.initResult);
+                    }
+                    module.asyncSuccessQueue = [];
+                }
+            }
+        },
+        _loadModuleDependencies: function(module, callback, errorback){
+            module.areDependenciesLoading = true;
+            var modules = this._getModules(module.dependencies);
+            log('module.name: %s depends on modules %s', module.name, module.dependencies);
+
+            //init all dependencies
+            //resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
+            this._initModules(modules, (function(module){
+                return function(resolvedDependencies){
+                    module.resolvedDependencies = resolvedDependencies;
+                    module.areDependenciesLoading = false;
+                    callback(module);
+                }
+            })(module), function(error){
+                errorback(error);
+            });
         },
 
         /**
@@ -146,11 +202,15 @@
                     result[module.name] = module;
                 }else{
                     if(this.asyncMap && this.asyncMap[moduleName]){
-                        result[moduleName] ={
+                        //the requested module has not been registered yet. register it!
+                        var partial = {
                             name: moduleName,
                             asyncPath:this.asyncMap[moduleName],
-                            isAsync:true
+                            isAsync:true,
+                            isPartial:true //we don't know the dependencies yet, so we have to parse after load to find out.
                         };
+                        this._registerModule(partial);
+                        result[moduleName] = partial;
                     }else{
                         result[moduleName] = undefined;
                     }
@@ -199,6 +259,18 @@
          */
         _registerModule: function(module){
             log('_registerModule called for module.name %s', module.name);
+            //if we're in amd mode we need to modify the current module to add dependencies, etc.
+            if(this._modules[module.name] && this._modules[module.name].isPartial){
+                //don't just reassign it because it has other references in initModules, etc.
+                //TODO: create a copy function for this so we don't miss stuff.
+                var partial = this._modules[module.name];
+                partial.dependencies = module.dependencies;
+                partial.paths = module.paths;
+                partial.autoInit = module.autoInit;
+                partial.init = module.init;
+                partial.context = module.context;
+                partial.isPartial = false;
+            }
             if(!this._modules[module.name] || module.isShim){ //don't allow a module to be re-registered (protection from overrides)
                 this._modules[module.name] = module;
             }
@@ -326,7 +398,10 @@
          */
         _createModuleFromShim: function(shimName, shimConfig){
             var initResult;
-
+            var isAsync = false;
+            if(this.asyncMap && this.asyncMap[shimName]){
+                isAsync = true;
+            }
             try{
                 initResult = eval(shimConfig.exports);
             }catch(e){}
@@ -336,7 +411,9 @@
                 dependencies : shimConfig.dependencies,
                 initResult: initResult, //result from running init.  WAIT TO DO THIS AS JQUERY MIGHT NOT BE LOADED.
                 isInitialized: !!initResult,
-                isShim: true
+                isShim: true,
+                shimConfig: shimConfig,
+                isAsync: isAsync
             };
             return module;
         },

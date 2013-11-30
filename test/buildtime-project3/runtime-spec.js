@@ -25,8 +25,8 @@ describe("modulus", function(){
             'TestOneModel': 'model/test1/TestOneModel',
             'pageOne': 'page/pageOne',
             '$':'vendor/jquery-1.10.2.min',
-            'Backbone':'vendor/backbone-1.1.0',
-            '_': 'vendor/underscore-1.5.2',
+            'Backbone':'vendor/backbone-1.1.0.min',
+            '_': 'vendor/underscore-1.5.2.min',
             'TestOneView': 'view/test1/TestOneView',
             'testOneController':'controller/testOneController'
         },
@@ -42,14 +42,35 @@ describe("modulus", function(){
         }
     });
 
-    //you can explicitly call require when needed or preferred.
-    it("should support a require function which resolves dependencies", function(){
+    xit("should support async loading of a single module with no dependencies", function(){
         var callbackExecuted = false;
-
-        modulus.require(function(pageOne){
-            callbackExecuted = true;
+        runs(function(){
+            m(function(_){
+                callbackExecuted = true;
+                expect(_.VERSION).toEqual('1.5.2');
+            });
         });
 
-        expect(callbackExecuted).toEqual(true);
+        waits(5000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+        });
+    });
+
+    it("should support async loading of a single module which has async dependencies", function(){
+        var callbackExecuted = false;
+        runs(function(){
+            m(function(Backbone){
+                callbackExecuted = true;
+                expect(Backbone.VERSION).toEqual('1.1.0');
+            });
+        });
+
+        waits(5000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+        });
     });
 });
