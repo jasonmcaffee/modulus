@@ -48,7 +48,7 @@
          * Define this if you wish to do AMD
          * params, in order: (moduleName, callback, errorback)
          */
-        asyncFileLoad: null,
+        //asyncFileLoad: null,
 
         /**
          * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
@@ -59,37 +59,33 @@
             var initModulesResults = [];
             modules = modules || this._modules;
             log('_initModules called for %s modules.', modules);
-            //boo hiss
+            //determine how many modules we need to load.
             var totalToLoad = 0;
             for(var moduleName in modules){++totalToLoad}
+
+            //iterate over each module to init. create a callback which waits until all modules all loaded before executing callback
             var i =0;
             var totalLoaded = {count:0};  //put in object so we can increment by ref
             for(var moduleName in modules){
-
                 var module = modules[moduleName];
                 this._initModule(module, this._createInitModuleCallback(totalLoaded, totalToLoad, callback, module, initModulesResults, i++), errorback);
-                //initModulesResults.push(module.initResult);
             }
-            return initModulesResults;
         },
 
         /**
-         *
+         * Called on by _initModules. Creates and returns a function which
          * @param totalLoaded
          * @param totalToLoad
          * @param initModulesCallback
          * @param module
          * @param initModulesResults
          * @param index
-         * @returns {Function}
-         * @private
+         * @returns {Function} which executes the initModulesCallback once all have been loaded.
          */
         _createInitModuleCallback:function(totalLoaded, totalToLoad, initModulesCallback, module, initModulesResults, index){
             return function(moduleInitResult){
-                //initModulesResults.push(moduleInitResult);
-                initModulesResults[index] = moduleInitResult;
+                initModulesResults[index] = moduleInitResult;//results must be in the same order they were passed in. e.g function(moduleA, moduleB) needs them in the correct order module.init.apply(null, [moduleA, moduleB]);
                 if(++totalLoaded.count >= totalToLoad){
-                    //these aren't in the correct order. you will have to sort them.
                     initModulesCallback(initModulesResults);
                 }
             }
@@ -102,6 +98,7 @@
          * Assigns the result of the function to module.initResult.
          *
          * @param module - the module you wish to init.
+         * @param callback - the function to execute once the module has completed loading.
          * @returns {*} - the result of module();
          */
         _initModule: function giveContext(module, callback, errorback){
@@ -121,56 +118,53 @@
                 if(module.isAsync){
                     if(!this.asyncFileLoad){ throw 'module was async or not registered properly. there is no asynFileLoad function provided. module name: ' + module.name;}
 
-                    if(module.isAsyncInProgress){
+                    if(module.isAsyncInProgress){return;}
 
-                    }else{
-                        module.isAsyncInProgress = true;
-                        //divide and conquer. load the file and it's dependencies at the same time.
 
-                        if(module.isShim){
-                            if(module.dependencies && module.dependencies.length > 0){
-                                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
-                            }else{
-                                this.asyncFileLoad(module.name, (function(module, config){
-                                    return function(){
-                                        log('async load completed for %s completed', module.name);
-                                        module.asyncComplete = true;
-                                        module.isAsyncInProgress = false;
-                                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                    }
-                                })(module, this), errorback);
-                            }
+                    module.isAsyncInProgress = true;
+
+                    if(module.isShim){
+                        if(module.dependencies && module.dependencies.length > 0){
+                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
                         }else{
-                            //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
                             this.asyncFileLoad(module.name, (function(module, config){
                                 return function(){
                                     log('async load completed for %s completed', module.name);
+                                    module.asyncComplete = true;
+                                    module.isAsyncInProgress = false;
+                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                }
+                            })(module, this), errorback);
+                        }
+                    }else{
+                        //divide and conquer. load the file and it's dependencies at the same time.
+                        //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
+                        this.asyncFileLoad(module.name, (function(module, config){
+                            return function(){
+                                log('async load completed for %s completed', module.name);
 
-                                    //we don't know the dependencies of a module until it has been loaded and registered.
-                                    //if the module does have dependencies
-                                    if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
-                                        log('async module %s loaded but has dependencies that were found after load.', module.name);
-                                        config._loadModuleDependencies(module, function(module){
-                                            module.asyncComplete = true;
-                                            module.isAsyncInProgress = false;
-                                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                        });
-                                    }else{
+                                //we don't know the dependencies of a module until it has been loaded and registered.
+                                //if the module does have dependencies
+                                if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
+                                    log('async module %s loaded but has dependencies that were found after load.', module.name);
+                                    config._loadModuleDependencies(module, function(module){
                                         module.asyncComplete = true;
                                         module.isAsyncInProgress = false;
                                         config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                    }
+                                    });
+                                }else{
+                                    module.asyncComplete = true;
+                                    module.isAsyncInProgress = false;
+                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
                                 }
-                            })(module, this), errorback);
-
-                            //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
-                            if(module.dependencies && module.dependencies.length > 0){
-                                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
                             }
+                        })(module, this), errorback);
+
+                        //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
+                        if(module.dependencies && module.dependencies.length > 0){
+                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
                         }
-
                     }
-
                 }
                 //retrieve module metadata for the dependencies
                 else if(module.dependencies && module.dependencies.length > 0){
@@ -218,6 +212,13 @@
                 }
             }
         },
+
+        /**
+         * Finds all the module's dependencies and ensures they are loaded & initialized.
+         * @param module - the module to load dependencies for.
+         * @param callback - the function to execute once all dependencies have been loaded.
+         * @param errorback - the function to execute if there is an error.
+         */
         _loadModuleDependencies: function(module, callback, errorback){
             module.areDependenciesLoading = true;
             var modules = this._getModules(module.dependencies);
@@ -239,6 +240,7 @@
 
         /**
          * Finds all modules by name.
+         * If a module is not found, register a partial version of the module, indicating that it needs to be loaded asynchronously.
          * @param arrayOfModuleNames - array of module names you wish to retrieve. e.g. ['moduleA', 'moduleB']
          * @returns {{}} - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
          */
@@ -254,6 +256,7 @@
                 }else{
                     //if(this.asyncMap && this.asyncMap[moduleName]){
                         //the requested module has not been registered yet. register it!
+                    //assume all unfound modules need to be loaded asynchronously.
                     var partial = {
                         name: moduleName,
                         //asyncPath:this.asyncMap[moduleName],
@@ -451,17 +454,13 @@
         _createModuleFromShim: function(shimName, shimConfig){
             var initResult;
             var isAsync = false;
-//            if(this.asyncMap && this.asyncMap[shimName]){  //this forces manual configuration, so its not ideal
-//                isAsync = true;
-//            }
             try{
                 initResult = eval(shimConfig.exports);
             }catch(e){
-                isAsync = true;
+                isAsync = true;//assume that the shim is async if its export is undefined.
             }
             var module = {
                 name: shimName,
-                paths: null, //todo?
                 dependencies : shimConfig.dependencies,
                 initResult: initResult, //result from running init.  WAIT TO DO THIS AS JQUERY MIGHT NOT BE LOADED.
                 isInitialized: !!initResult,
@@ -513,6 +512,7 @@
         }
 
     }
+
     /**
      * Starting point for modulus.
      * Scans for module functions, creates metadata for each, adds metadata to this._modules, and runs any module functions
@@ -520,7 +520,7 @@
      */
     modulus.init = function(settings){
         var start = new Date().getTime();
-        modulus.config = merge(defaults, settings);
+        modulus.config = merge(defaults, settings);//this does not delete modules.
         modulus.config._findAndRegisterModules();
         modulus.config._initAutoInitModules();
         if(modulus.anonymousInitQueue){
@@ -541,6 +541,7 @@
     modulus.reset = function(){
         modulus.config._modules = defaults._modules = {};
     };
+
     /**
      * Allows you to get module dependencies for the passed in anonymous function.
      * e.g.
