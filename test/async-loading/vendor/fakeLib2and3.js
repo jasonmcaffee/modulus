@@ -1,1 +1,1 @@
-var fakeLib2and3 = fakeLib2 + fakeLib3;
+window.fakeLib2and3 = fakeLib2 + fakeLib3;

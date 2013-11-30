@@ -43,7 +43,7 @@
          * If you use this option, you must implement asyncFileLoad
          * e.g. {'moduleName' : 'path/to/module'}
          */
-        asyncMap:{},
+        //asyncMap:{},
         /**
          * Define this if you wish to do AMD
          * params, in order: (moduleName, callback, errorback)
@@ -119,7 +119,7 @@
                 }
 
                 if(module.isAsync){
-                    if(!this.asyncFileLoad){ throw 'async module defined, but there is no asynFileLoad function provided. You must provide asyncFileLoad via init configuration';}
+                    if(!this.asyncFileLoad){ throw 'module was async or not registered properly. there is no asynFileLoad function provided. module name: ' + module.name;}
 
                     if(module.isAsyncInProgress){
 
@@ -451,12 +451,14 @@
         _createModuleFromShim: function(shimName, shimConfig){
             var initResult;
             var isAsync = false;
-            if(this.asyncMap && this.asyncMap[shimName]){
-                isAsync = true;
-            }
+//            if(this.asyncMap && this.asyncMap[shimName]){  //this forces manual configuration, so its not ideal
+//                isAsync = true;
+//            }
             try{
                 initResult = eval(shimConfig.exports);
-            }catch(e){}
+            }catch(e){
+                isAsync = true;
+            }
             var module = {
                 name: shimName,
                 paths: null, //todo?

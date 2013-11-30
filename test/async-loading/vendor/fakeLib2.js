@@ -1,1 +1,1 @@
-var fakeLib2 = 2;
+window.fakeLib2 = 2;
