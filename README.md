@@ -101,6 +101,8 @@ modulus.require(function (moduleB){
 ```
 
 ## AMD
+Currently the AMD functionality resides in [src/modulus/modulusAsync](src/modulus/modulusAsynch.js)
+This will likely be merged with the non async version (src/modulus/modulus.js) soon.
 If you wish to asynchronously load modules, you will need to provide an asyncFileLoad function.
 
 Example Project can be found [here](test/async-loading).
