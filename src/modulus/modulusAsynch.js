@@ -125,8 +125,21 @@
 
                     if(module.isShim){
                         if(module.dependencies && module.dependencies.length > 0){
-                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
-                        }else{
+                            //shim's dependencies must be loaded first.
+                            this._loadModuleDependencies(module, (function(config){
+                                return function(module){
+                                    //now that the dependencies have loaded, load the shim.
+                                    config.asyncFileLoad(module.name, (function(module, config){
+                                        return function(){
+                                            log('async load completed for %s completed', module.name);
+                                            module.asyncComplete = true;
+                                            module.isAsyncInProgress = false;
+                                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                        }
+                                    })(module, config), errorback);
+                                }
+                            })(this), errorback);
+                        }else{//no dependencies, just load the shim
                             this.asyncFileLoad(module.name, (function(module, config){
                                 return function(){
                                     log('async load completed for %s completed', module.name);

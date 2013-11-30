@@ -238,7 +238,7 @@ describe("modulus async shims", function(){
     });
 
 
-    it("should support async loading of a single shim with no dependencies", function(){
+   xit("should support async loading of a single shim with no dependencies", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(fakeLib1){
@@ -255,7 +255,7 @@ describe("modulus async shims", function(){
         });
     });
 
-    it("it should not create an ajax request when the shim has been loaded already", function(){
+    xit("it should not create an ajax request when the shim has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(fakeLib1){
@@ -277,7 +277,7 @@ describe("modulus async shims", function(){
         });
     });
 
-    it("it should download multiple shims simultaneously and callback when both are loaded", function(){
+    xit("it should download multiple shims simultaneously and callback when both are loaded", function(){
         var callbackExecuted = false;
         var testCallbackExecuted = false;
         //test callback is fired on ajax success. the count should be 2.
@@ -302,6 +302,67 @@ describe("modulus async shims", function(){
             expect(ajaxCount).toEqual(2);
             expect(testCallbackExecuted).toEqual(true);
         });
+    });
+
+
+    xit("it should download a shim, then download it's dependencies at the same time (when they don't have dependencies)", function(){
+        var callbackExecuted = false;
+        var testCallbackExecuted = false;
+        var testCallbackCount = 0;
+        //test callback is fired on ajax success. the count should be 2.
+        testCallback = function(count){
+            ++testCallbackCount;
+
+            if(testCallbackCount == 1){
+                expect(count).toEqual(2);
+            }
+            if(testCallbackCount == 2){
+                expect(count).toEqual(2); //still waiting for dependencies to load.
+            }
+            if(testCallbackCount == 3){
+                expect(count).toEqual(3);
+                testCallbackExecuted = true;
+                testCallback = null;
+            }
+
+        };
+
+        runs(function(){
+            m(function(fakeLib2and3){
+                callbackExecuted = true;
+                expect(fakeLib2and3).toEqual(5);
+            });
+        });
+
+        waits(1000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+            expect(ajaxCount).toEqual(3);
+            expect(testCallbackExecuted).toEqual(true);
+        });
+    });
+
+    it("should handle lots requests for async shims", function(){
+        var callbackExecutedCount = 0;
+
+        runs(function(){
+            m(function(fakeLib3, fakeLib2and3, fakeLib2, fakeLib1and2and3and4, fakeLib1){
+                callbackExecutedCount++;
+                expect(fakeLib2and3).toEqual(5);
+                expect(fakeLib2).toEqual(2);
+                expect(fakeLib1).toEqual(1);
+                expect(fakeLib1and2and3and4).toEqual(10);
+            });
+        });
+
+        waits(1000);
+
+        runs(function(){
+            expect(callbackExecutedCount).toEqual(1);
+            //expect(ajaxCount).toEqual(3);
+        });
+
     });
 
 });
