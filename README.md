@@ -147,6 +147,8 @@ Modulus will attempt to asynchronously load any module that is not currently reg
 
 When you require a module asynchronously, the module will first be downloaded, and then it's dependencies will be downloaded simultaneously.
 
+Note: this means that the order in which the dependencies are loaded is not guaranteed.
+
 When you require a module that has already been loaded, a new asyncFileLoad request will not be made.
 
 Shim entries that are asynchronously downloaded will have dependencies loaded first. (e.g. Backbone shouldn't be loaded until underscore is)
