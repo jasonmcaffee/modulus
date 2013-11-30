@@ -43,7 +43,7 @@
         /**
          * Iterates over the hash of modules, passing each to _initModule so the module and its dependencies can be initialized.
          * @param modules - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
-         * @returns {Array} - array of results from the init. (needed to pass results into module.init.apply)
+         * @returns {Array} - array of results from the init. (needed to pass results into module.init.apply) - these will be in the same order that they appear in the modules hash.
          */
         _initModules:function(modules,callback, errorback){
             var initModulesResults = [];
@@ -55,21 +55,24 @@
             var i =0;
             var totalLoaded = {count:0};  //put in object so we can increment by ref
             for(var moduleName in modules){
-                ++i;
+
                 var module = modules[moduleName];
-                this._initModule(module, this._createInitModuleCallback(totalLoaded, totalToLoad, callback, module, initModulesResults), errorback);
+                this._initModule(module, this._createInitModuleCallback(totalLoaded, totalToLoad, callback, module, initModulesResults, i++), errorback);
                 //initModulesResults.push(module.initResult);
             }
             return initModulesResults;
         },
-        _createInitModuleCallback:function(totalLoaded, totalToLoad, initModulesCallback, module, initModulesResults){
+        _createInitModuleCallback:function(totalLoaded, totalToLoad, initModulesCallback, module, initModulesResults, index){
             return function(moduleInitResult){
-                initModulesResults.push(moduleInitResult);
+                //initModulesResults.push(moduleInitResult);
+                initModulesResults[index] = moduleInitResult;
                 if(++totalLoaded.count >= totalToLoad){
+                    //these aren't in the correct order. you will have to sort them.
                     initModulesCallback(initModulesResults);
                 }
             }
         },
+
 
         /**
          * Runs the module function for the passed in module if the function has not been ran before (module.isInitialized == false)
@@ -89,7 +92,9 @@
             try{
 
                 module.asyncSuccessQueue = module.asyncSuccessQueue || [];
-                module.asyncSuccessQueue.push(callback);
+                if(callback){ //define and require don't provide a callback
+                    module.asyncSuccessQueue.push(callback);
+                }
 
                 if(module.isAsync){
                     if(!this.asyncFileLoad){ throw 'async module defined, but there is no asynFileLoad function provided. You must provide asyncFileLoad via init configuration';}
@@ -100,31 +105,37 @@
                         module.isAsyncInProgress = true;
                         //divide and conquer. load the file and it's dependencies at the same time.
 
-                        //DON'T DO IT THIS WAY FOR SHIMs. Load the dependencies first. maybe don't ever do it this way.
-                        this.asyncFileLoad(module.name, (function(module, config){
-                            return function(){
-                                log('async load completed for %s completed', module.name);
+                        if(module.isShim){
 
-                                if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
-                                    log('async module %s loaded but has dependencies that were found after load.', module.name);
-                                    config._loadModuleDependencies(module, function(module){
+
+                        }else{
+                            //DON'T DO IT THIS WAY FOR SHIMs. Load the dependencies first. maybe don't ever do it this way.
+                            this.asyncFileLoad(module.name, (function(module, config){
+                                return function(){
+                                    log('async load completed for %s completed', module.name);
+
+                                    if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
+                                        log('async module %s loaded but has dependencies that were found after load.', module.name);
+                                        config._loadModuleDependencies(module, function(module){
+                                            module.asyncComplete = true;
+                                            module.isAsyncInProgress = false;
+                                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                        });
+                                    }else{
                                         module.asyncComplete = true;
                                         module.isAsyncInProgress = false;
                                         config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                    });
-                                }else{
-                                    module.asyncComplete = true;
-                                    module.isAsyncInProgress = false;
-                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                    }
                                 }
-                            }
-                        })(module, this), errorback);
+                            })(module, this), errorback);
 
-                        //DON'T DO THIS. If backbone loads before it's dependency Underscore, there will be a script error.
-                        //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
-                        if(module.dependencies && module.dependencies.length > 0){
-                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+                            //DON'T DO THIS. If backbone loads before it's dependency Underscore, there will be a script error.
+                            //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
+                            if(module.dependencies && module.dependencies.length > 0){
+                                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+                            }
                         }
+
                     }
 
                 }
@@ -208,24 +219,25 @@
                 if(module){
                     result[module.name] = module;
                 }else{
-                    if(this.asyncMap && this.asyncMap[moduleName]){
+                    //if(this.asyncMap && this.asyncMap[moduleName]){
                         //the requested module has not been registered yet. register it!
-                        var partial = {
-                            name: moduleName,
-                            asyncPath:this.asyncMap[moduleName],
-                            isAsync:true,
-                            isPartial:true //we don't know the dependencies yet, so we have to parse after load to find out.
-                        };
-                        this._registerModule(partial);
-                        result[moduleName] = partial;
-                    }else{
-                        result[moduleName] = undefined;
-                    }
+                    var partial = {
+                        name: moduleName,
+                        //asyncPath:this.asyncMap[moduleName],
+                        isAsync:true,
+                        isPartial:true //we don't know the dependencies yet, so we have to parse after load to find out.
+                    };
+                    this._registerModule(partial);
+                    result[moduleName] = partial;
+//                    }else{
+//                        result[moduleName] = undefined;
+//                    }
                 }
 
             }
             return result;
         },
+
 
         /**
          * Initializes all modules with autoInit metadata flag set to true.
