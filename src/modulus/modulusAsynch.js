@@ -128,8 +128,18 @@
                         //divide and conquer. load the file and it's dependencies at the same time.
 
                         if(module.isShim){
-
-
+                            if(module.dependencies && module.dependencies.length > 0){
+                                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+                            }else{
+                                this.asyncFileLoad(module.name, (function(module, config){
+                                    return function(){
+                                        log('async load completed for %s completed', module.name);
+                                        module.asyncComplete = true;
+                                        module.isAsyncInProgress = false;
+                                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                    }
+                                })(module, this), errorback);
+                            }
                         }else{
                             //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
                             this.asyncFileLoad(module.name, (function(module, config){

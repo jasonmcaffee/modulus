@@ -150,7 +150,7 @@ xdescribe("modulus async modules", function(){
 
 });
 
-xdescribe("modulus async modules", function(){
+describe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
     modulus.init({
