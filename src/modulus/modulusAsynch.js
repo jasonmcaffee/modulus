@@ -120,7 +120,6 @@
 
                     if(module.isAsyncInProgress){return;}
 
-
                     module.isAsyncInProgress = true;
 
                     if(module.isShim){
@@ -468,7 +467,7 @@
             var initResult;
             var isAsync = false;
             try{
-                initResult = eval(shimConfig.exports);
+                initResult = eval(shimConfig.exports);      //TODO: instead of eval, use window[exports]. also, move this to _resolveShimExports function.
             }catch(e){
                 isAsync = true;//assume that the shim is async if its export is undefined.
             }

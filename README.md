@@ -101,8 +101,6 @@ modulus.require(function (moduleB){
 ```
 
 ## AMD
-NOTE: WORK IN PROGRESS. DOES NOT CURRENTLY SUPPORT LOADING NON-MODULUS MODULES.
-
 Currently the AMD functionality resides in [src/modulus/modulusAsync](src/modulus/modulusAsynch.js)
 This will likely be merged with the non async version (src/modulus/modulus.js) soon.
 
