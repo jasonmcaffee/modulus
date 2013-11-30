@@ -1,4 +1,4 @@
-describe("modulus", function(){
+xdescribe("modulus async modules", function(){
     var ajaxCount = 0;
     var testCallback;
     modulus.init({
@@ -17,27 +17,21 @@ describe("modulus", function(){
                 exports:'_'
             }
         },
+        //we can optionally use our own config to map module names to paths.
         asyncMap:{
-//            'Controller':'core/mvc/Controller',
-//            'Model':'core/mvc/Model',
-//            'View': 'core/mvc/View',
-//            'log': 'core/util/log',
-//            'core': 'core/core',
-//            'global': 'base/global',
-//            'TestOneModel': 'model/test1/TestOneModel',
-//            'pageOne': 'page/pageOne',
-//            '$':'vendor/jquery-1.10.2.min',
-//            'Backbone':'vendor/backbone-1.1.0.min',
-//            '_': 'vendor/underscore-1.5.2.min',
-//            'TestOneView': 'view/test1/TestOneView',
-//            'testOneController':'controller/testOneController'
+             //since jquery is already on the test page, we won't need to load it again.
+             'Backbone':'vendor/backbone-1.1.0.min',
+             '_': 'vendor/underscore-1.5.2.min'
         },
         asyncFileLoad:function(moduleName, callback, errorback){
             ajaxCount++;
             var root = 'test/async-loading/';
             if(moduleName.indexOf('module')>=0){
-                moduleName = 'modules/'+moduleName
+                moduleName = 'modules/'+moduleName;
+            }else{
+                moduleName = this.asyncMap[moduleName];
             }
+
             var path = root+moduleName + '.js';
             $.ajax({
                 url: path,
@@ -153,5 +147,118 @@ describe("modulus", function(){
             expect(testCallbackExecuted).toEqual(true);
         });
     });
+
+});
+
+xdescribe("modulus async modules", function(){
+    var ajaxCount = 0;
+    var testCallback;
+    modulus.init({
+        //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
+        shim:{
+            '$':{
+                dependencies:[],
+                exports:'$'
+            },
+            'Backbone':{
+                dependencies: ['_', '$'],
+                exports:'Backbone'
+            },
+            '_':{
+                dependencies: [],
+                exports:'_'
+            },
+            'fakeLib1':{
+                dependencies:[],
+                exports:'fakeLib1'
+            },
+            'fakeLib2':{
+                dependencies:[],
+                exports:'fakeLib2'
+            },
+            'fakeLib3':{
+                dependencies:[],
+                exports:'fakeLib3'
+            },
+            'fakeLib4':{
+                dependencies:[],
+                exports:'fakeLib4'
+            },
+            'fakeLib2and3':{
+                dependencies:['fakeLib2', 'fakeLib3'],
+                exports:'fakeLib2and3'
+            },
+            'fakeLib1and2and3and4':{
+                dependencies:['fakeLib1', 'fakeLib2', 'fakeLib3', 'fakeLib4'],
+                exports:'fakeLib1and2and3and4'
+            }
+
+        },
+        asyncMap:{
+            'Backbone':'vendor/backbone-1.1.0.min',
+            '_': 'vendor/underscore-1.5.2.min'
+        },
+        asyncFileLoad:function(moduleName, callback, errorback){
+            ajaxCount++;
+            var root = 'test/async-loading/';
+            if(moduleName.indexOf('module')>=0){
+                moduleName = 'modules/'+moduleName;
+            }else if(moduleName.indexOf('fakeLib')>=0){
+                moduleName = 'vendor/'+moduleName;
+            }else{
+                moduleName = this.asyncMap[moduleName];
+            }
+            var path = root+moduleName + '.js';
+            $.ajax({
+                url: path,
+                crossDomain:true, //allow local file system cross domain requests.
+                dataType: "script",
+                success: function(){
+                    if(testCallback){testCallback(ajaxCount);}
+                    //random slowdown.
+                    setTimeout(function(){
+
+                        callback();
+                    }, Math.floor(Math.random()*500));
+                }
+            }).fail(function(err){errorback(err)});
+        }
+    });
+
+    it("should support async loading of a single shim with no dependencies", function(){
+        var callbackExecuted = false;
+        runs(function(){
+            m(function(fakeLib1){
+                callbackExecuted = true;
+                expect(fakeLib1).toEqual(1);
+            });
+        });
+
+        waits(1000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+            expect(ajaxCount).toEqual(1);
+        });
+    });
+
+    it("it should not create an ajax request when the shim has been loaded already", function(){
+        var callbackExecuted = false;
+        runs(function(){
+            m(function(fakeLib1){
+                callbackExecuted = true;
+                expect(fakeLib1).toEqual(1);
+            });
+        });
+
+        waits(1000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+            expect(ajaxCount).toEqual(1);
+        });
+    });
+
+
 
 });

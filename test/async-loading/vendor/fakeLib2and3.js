@@ -1,0 +1,1 @@
+var fakeLib2and3 = fakeLib2 + fakeLib3;
