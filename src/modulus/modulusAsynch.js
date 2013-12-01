@@ -109,7 +109,6 @@
                 return;
             }
             try{
-
                 module.asyncSuccessQueue = module.asyncSuccessQueue || [];
                 if(callback){ //define and require don't provide a callback
                     module.asyncSuccessQueue.push(callback);
@@ -123,59 +122,9 @@
                     module.isAsyncInProgress = true;
 
                     if(module.isShim){
-                        if(module.dependencies && module.dependencies.length > 0){
-                            //shim's dependencies must be loaded first.
-                            this._loadModuleDependencies(module, (function(config){
-                                return function(module){
-                                    //now that the dependencies have loaded, load the shim.
-                                    config.asyncFileLoad(module.name, (function(module, config){
-                                        return function(){
-                                            log('async load completed for %s completed', module.name);
-                                            module.asyncComplete = true;
-                                            module.isAsyncInProgress = false;
-                                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                        }
-                                    })(module, config), errorback);
-                                }
-                            })(this), errorback);
-                        }else{//no dependencies, just load the shim
-                            this.asyncFileLoad(module.name, (function(module, config){
-                                return function(){
-                                    log('async load completed for %s completed', module.name);
-                                    module.asyncComplete = true;
-                                    module.isAsyncInProgress = false;
-                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                }
-                            })(module, this), errorback);
-                        }
+                        this._initModuleDependenciesFirst(module, errorback);
                     }else{
-                        //divide and conquer. load the file and it's dependencies at the same time.
-                        //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
-                        this.asyncFileLoad(module.name, (function(module, config){
-                            return function(){
-                                log('async load completed for %s completed', module.name);
-
-                                //we don't know the dependencies of a module until it has been loaded and registered.
-                                //if the module does have dependencies
-                                if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
-                                    log('async module %s loaded but has dependencies that were found after load.', module.name);
-                                    config._loadModuleDependencies(module, function(module){
-                                        module.asyncComplete = true;
-                                        module.isAsyncInProgress = false;
-                                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                    });
-                                }else{
-                                    module.asyncComplete = true;
-                                    module.isAsyncInProgress = false;
-                                    config._executeCallbacksIfModuleIsDoneLoading(module);//static function
-                                }
-                            }
-                        })(module, this), errorback);
-
-                        //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
-                        if(module.dependencies && module.dependencies.length > 0){
-                            this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
-                        }
+                        this._initModuleAndDependenciesSimultaneously(module, errorback);
                     }
                 }
                 //retrieve module metadata for the dependencies
@@ -194,10 +143,83 @@
                 e.message = errorMessage + e.message;
                 throw e; //do not swallow exceptions! if there's any error in the module init, we need to let it propogate.
             }
-
-            //return module.initResult;
         },
-        //static function. should have no references to this.
+
+        /**
+         * Initializes the module and its dependencies, but loads & initializes the dependencies before the module.
+         * @param module
+         * @param errorback
+         * @private
+         */
+        _initModuleDependenciesFirst:function(module, errorback){
+            if(module.dependencies && module.dependencies.length > 0){
+                //shim's dependencies must be loaded first.
+                this._loadModuleDependencies(module, (function(config){
+                    return function(module){
+                        //now that the dependencies have loaded, load the shim.
+                        config.asyncFileLoad(module.name, (function(module, config){
+                            return function(){
+                                log('async load completed for %s completed', module.name);
+                                module.asyncComplete = true;
+                                module.isAsyncInProgress = false;
+                                config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                            }
+                        })(module, config), errorback);
+                    }
+                })(this), errorback);
+            }else{//no dependencies, just load the shim
+                this.asyncFileLoad(module.name, (function(module, config){
+                    return function(){
+                        log('async load completed for %s completed', module.name);
+                        module.asyncComplete = true;
+                        module.isAsyncInProgress = false;
+                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                    }
+                })(module, this), errorback);
+            }
+        },
+
+        /**
+         * Initializes the module and its dependencies, but loads the module and its dependencies simultaneously.
+         * @param module
+         * @param errorback
+         * @private
+         */
+        _initModuleAndDependenciesSimultaneously:function(module, errorback){
+            //divide and conquer. load the file and it's dependencies at the same time.
+            //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
+            this.asyncFileLoad(module.name, (function(module, config){
+                return function(){
+                    log('async load completed for %s completed', module.name);
+
+                    //we don't know the dependencies of a module until it has been loaded and registered.
+                    //if the module does have dependencies
+                    if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
+                        log('async module %s loaded but has dependencies that were found after load.', module.name);
+                        config._loadModuleDependencies(module, function(module){
+                            module.asyncComplete = true;
+                            module.isAsyncInProgress = false;
+                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                        });
+                    }else{
+                        module.asyncComplete = true;
+                        module.isAsyncInProgress = false;
+                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                    }
+                }
+            })(module, this), errorback);
+
+            //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
+            if(module.dependencies && module.dependencies.length > 0){
+                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+            }
+        },
+
+        /**
+         *
+         * @param module
+         * @private
+         */
         _executeCallbacksIfModuleIsDoneLoading:function(module){
             if(!module.isAsync ||(module.isAsync && module.asyncComplete)){
                 //if(module.dependencies.length == 0 || module.resolvedDependencies){
