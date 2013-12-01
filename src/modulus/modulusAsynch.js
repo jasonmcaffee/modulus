@@ -134,8 +134,9 @@
                     })(this), errorback);
                 }else{
                     //run the module init
-                    this._resolveModule(module);
-                    callback(module.initResult);
+                    //this._resolveModule(module);
+                    this._executeCallbacksIfModuleIsDoneLoading(module);
+                    //callback(module.initResult);
                 }
             }catch(e){
                 var errorMessage = 'modulus: error initializing module.name: ' + (module.name || 'anonymous' )+ '\n error:'; //+ ' \n error: ' + e
@@ -194,7 +195,7 @@
 
                     //we don't know the dependencies of a module until it has been loaded and registered.
                     //if the module does have dependencies
-                    if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
+                    if(module.dependencies && module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
                         //log('async module %s loaded but has dependencies that were found after load.', module.name);
                         config._loadModuleDependencies(module, function(module){
                             module.asyncComplete = true;
@@ -335,6 +336,20 @@
         },
 
         /**
+         * function.name is not supported by all browsers (eg. ie9) so evaluate the function string.
+         * @param func
+         * @private
+         */
+        _parseFunctionName:function(func){
+            if(func.name){return func.name;}
+            var reg = /function(.*)\(/g;
+            var matches = reg.exec(func.toString());
+            var funcName = matches? matches[1] : '';
+            funcName = funcName.replace(/\s/g, '');
+            return funcName;
+        },
+
+        /**
          * Adds the module to this._modules.
          * e.g. this.modules[module.name] = module
          * If the module is already added, it will not be overridden, unless it is a shim
@@ -383,7 +398,10 @@
             var func = modulePartial.func;
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
-            var moduleName = moduleMeta.name || modulePartial.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
+            var moduleName = moduleMeta.name || modulePartial.name;//prefer meta name so ns.moduleA = function(){} can work.
+            if(!moduleName){
+                moduleName = this._parseFunctionName(func);
+            }
             //log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
@@ -550,7 +568,7 @@
         if(metadata){func.module = metadata;}
         var module = modulus.config._createModuleFromFunction({key:func.name, func:func}, true);
 
-        if(func.name){
+        if(module.name){
             modulus.config._registerModule(module);
 //            if(module.module && module.module.autoInit){
 //                //modulus.config._initModule(module);  add to queue.
