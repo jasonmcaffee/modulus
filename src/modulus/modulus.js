@@ -47,7 +47,7 @@
         _initModules:function(modules){
             var moduleInitResults = [];
             modules = modules || this._modules;
-            log('_initModules called for %s modules.', modules);
+            //log('_initModules called for %s modules.', modules);
             for(var moduleName in modules){
                 var module = modules[moduleName];
                 this._initModule(module);
@@ -83,7 +83,7 @@
                 module.isInitialized = true;
             }catch(e){
                 var errorMessage = 'modulus: error initializing module.name: ' + (module.name || 'anonymous' )+ '\n error:'; //+ ' \n error: ' + e
-                console.error(errorMessage);
+                //console.error(errorMessage);
                 e.message = errorMessage + e.message;
                 throw e; //do not swallow exceptions! if there's any error in the module init, we need to let it propogate.
             }
@@ -180,7 +180,7 @@
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
             var moduleName = moduleMeta.name || modulePartial.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
-            log('creating module from func for module.name: %s', moduleName);
+            //log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,

@@ -1,5 +1,5 @@
 function moduleA(moduleB){
-    console.log('moduleA has been loaded');
+    //console.log('moduleA has been loaded');
     return {
         prop1: 123,
         moduleB: moduleB
