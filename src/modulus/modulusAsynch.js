@@ -17,12 +17,12 @@
         return result;
     }
 
-    function log(){
-        return;
-        if(window.console && window.console.log){
-            console.log.apply(console, arguments);
-        }
-    }
+//    function log(){
+//        return;
+//        if(window.console && window.console.log){
+//            console.log.apply(console, arguments);
+//        }
+//    }
 
     var defaults = {
         context: modulusContext, //by default we use the window for the context. e.g. function moduleA(){} ends up on the window.
@@ -58,7 +58,7 @@
         _initModules:function(modules,callback, errorback){
             var initModulesResults = [];
             modules = modules || this._modules;
-            log('_initModules called for %s modules.', modules);
+            //log('_initModules called for %s modules.', modules);
             //determine how many modules we need to load.
             var totalToLoad = 0;
             for(var moduleName in modules){++totalToLoad}
@@ -102,7 +102,7 @@
          * @returns {*} - the result of module();
          */
         _initModule: function giveContext(module, callback, errorback){
-            log('init called for module.name: %s', module.name);
+            //log('init called for module.name: %s', module.name);
             //if the module has already been initialized, return it's result
             if(module.isInitialized){
                 callback(module.initResult);
@@ -159,7 +159,7 @@
                         //now that the dependencies have loaded, load the shim.
                         config.asyncFileLoad(module.name, (function(module, config){
                             return function(){
-                                log('async load completed for %s completed', module.name);
+                                //log('async load completed for %s completed', module.name);
                                 module.asyncComplete = true;
                                 module.isAsyncInProgress = false;
                                 config._executeCallbacksIfModuleIsDoneLoading(module);//static function
@@ -170,7 +170,7 @@
             }else{//no dependencies, just load the shim
                 this.asyncFileLoad(module.name, (function(module, config){
                     return function(){
-                        log('async load completed for %s completed', module.name);
+                        //log('async load completed for %s completed', module.name);
                         module.asyncComplete = true;
                         module.isAsyncInProgress = false;
                         config._executeCallbacksIfModuleIsDoneLoading(module);//static function
@@ -190,12 +190,12 @@
             //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
             this.asyncFileLoad(module.name, (function(module, config){
                 return function(){
-                    log('async load completed for %s completed', module.name);
+                    //log('async load completed for %s completed', module.name);
 
                     //we don't know the dependencies of a module until it has been loaded and registered.
                     //if the module does have dependencies
                     if(module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
-                        log('async module %s loaded but has dependencies that were found after load.', module.name);
+                        //log('async module %s loaded but has dependencies that were found after load.', module.name);
                         config._loadModuleDependencies(module, function(module){
                             module.asyncComplete = true;
                             module.isAsyncInProgress = false;
@@ -256,7 +256,7 @@
         _loadModuleDependencies: function(module, callback, errorback){
             module.areDependenciesLoading = true;
             var modules = this._getModules(module.dependencies);
-            log('module.name: %s depends on modules %s', module.name, module.dependencies);
+            //log('module.name: %s depends on modules %s', module.name, module.dependencies);
 
             //init all dependencies
             //resolvedDependencies = this._initModules(modules);//make sure all dependencies are initialized.
@@ -347,7 +347,7 @@
          * @param module - the module you wish to register.
          */
         _registerModule: function(module){
-            log('_registerModule called for module.name %s', module.name);
+            //log('_registerModule called for module.name %s', module.name);
             //if we're in amd mode we need to modify the current module to add dependencies, etc.
             if(this._modules[module.name] && this._modules[module.name].isPartial){
                 //don't just reassign it because it has other references in initModules, etc.
@@ -385,12 +385,12 @@
          * @returns {{name: *, paths: *, dependencies: *, resolvedDeps: undefined, autoInit: *, init: *, isInitialized: boolean, context: (*|Function|Function|l.jQuery.context|F.context|G.context|Handlebars.AST.PartialNode.context|Handlebars.JavaScriptCompiler.context|context|.Assign.context|string|Code.context|x.context|context|jQuery.context|context|jQuery.context|context)}}
          */
         _createModuleFromFunction: function(modulePartial, force){
-            log('_createModuleFromFunction called');
+            //log('_createModuleFromFunction called');
             var func = modulePartial.func;
             var moduleMeta = typeof func.module == 'object' ? func.module : {};
             if(!moduleMeta && !force){ return; }
             var moduleName = moduleMeta.name || modulePartial.name || func.name;//prefer meta name so ns.moduleA = function(){} can work.
-            log('creating module from func for module.name: %s', moduleName);
+            //log('creating module from func for module.name: %s', moduleName);
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,
@@ -477,9 +477,22 @@
         },
 
         /**
+         * Attempts to resolve the string exports e.g. 'Backbone' to the real value of the shim.
+         * @param shimName
+         * @param shimConfig
+         * @returns {shimResult: Backbone, success:true} or {shimResult: undefined, success:false}
+         */
+        _resolveShim:function(shimName, shimConfig){
+            var result = {};
+            result.shimResult = window[shimConfig.exports];
+            result.success = typeof result.shimResult != 'undefined';
+            return result;
+        },
+
+        /**
          * Creates module metadata based on the shim config entry.
          * Uses eval(shimConfig.exports) to get the initResult
-         * Note: eval is faster than new Function http://jsperf.com/eval-vs-new-func
+         *
          *
          * @param shimName
          * @param shimConfig
@@ -488,11 +501,13 @@
         _createModuleFromShim: function(shimName, shimConfig){
             var initResult;
             var isAsync = false;
-            try{
-                initResult = eval(shimConfig.exports);      //TODO: instead of eval, use window[exports]. also, move this to _resolveShimExports function.
-            }catch(e){
-                isAsync = true;//assume that the shim is async if its export is undefined.
+            var resolvedShim = this._resolveShim(shimName, shimConfig);
+            if(resolvedShim.success){
+                initResult = resolvedShim.shimResult;
+            }else{
+                isAsync = true;
             }
+
             var module = {
                 name: shimName,
                 dependencies : shimConfig.dependencies,
@@ -566,7 +581,7 @@
         }
         var end = new Date().getTime();
         var total = end-start;
-        log('modulus initialized in %s ms', total);
+        //log('modulus initialized in %s ms', total);
     };
 
     /**
