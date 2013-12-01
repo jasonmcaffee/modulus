@@ -91,7 +91,6 @@
             }
         },
 
-
         /**
          * Runs the module function for the passed in module if the function has not been ran before (module.isInitialized == false)
          * Runs the init for any dependency modules if they have not been initialized
@@ -116,7 +115,6 @@
 
                 if(module.isAsync){
                     if(!this.asyncFileLoad){ throw 'module was async or not registered properly. there is no asynFileLoad function provided. module name: ' + module.name;}
-
                     if(module.isAsyncInProgress){return;}
 
                     module.isAsyncInProgress = true;
@@ -129,12 +127,14 @@
                 }
                 //retrieve module metadata for the dependencies
                 else if(module.dependencies && module.dependencies.length > 0){
-                    this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading, errorback);
-
+                    this._loadModuleDependencies(module, (function(config){
+                        return function(module){
+                            config._executeCallbacksIfModuleIsDoneLoading(module);
+                        }
+                    })(this), errorback);
                 }else{
                     //run the module init
-                    module.initResult = module.init.apply(undefined, []);
-                    module.isInitialized = true;
+                    this._resolveModule(module);
                     callback(module.initResult);
                 }
             }catch(e){
@@ -162,7 +162,7 @@
                                 //log('async load completed for %s completed', module.name);
                                 module.asyncComplete = true;
                                 module.isAsyncInProgress = false;
-                                config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                                config._executeCallbacksIfModuleIsDoneLoading(module);
                             }
                         })(module, config), errorback);
                     }
@@ -173,7 +173,7 @@
                         //log('async load completed for %s completed', module.name);
                         module.asyncComplete = true;
                         module.isAsyncInProgress = false;
-                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                        config._executeCallbacksIfModuleIsDoneLoading(module);
                     }
                 })(module, this), errorback);
             }
@@ -199,19 +199,23 @@
                         config._loadModuleDependencies(module, function(module){
                             module.asyncComplete = true;
                             module.isAsyncInProgress = false;
-                            config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                            config._executeCallbacksIfModuleIsDoneLoading(module);
                         });
                     }else{
                         module.asyncComplete = true;
                         module.isAsyncInProgress = false;
-                        config._executeCallbacksIfModuleIsDoneLoading(module);//static function
+                        config._executeCallbacksIfModuleIsDoneLoading(module);
                     }
                 }
             })(module, this), errorback);
 
             //if the module is not a partial, it will already have dependencies defined, so try to load them asap.
             if(module.dependencies && module.dependencies.length > 0){
-                this._loadModuleDependencies(module, this._executeCallbacksIfModuleIsDoneLoading);
+                this._loadModuleDependencies(module, (function(config){
+                    return function(module){
+                        config._executeCallbacksIfModuleIsDoneLoading(module);
+                    }
+                })(this));
             }
         },
 
@@ -222,11 +226,11 @@
          */
         _executeCallbacksIfModuleIsDoneLoading:function(module){
             if(!module.isAsync ||(module.isAsync && module.asyncComplete)){
-                //if(module.dependencies.length == 0 || module.resolvedDependencies){
+                //if the module's dependencies are done loading, initialize the module
                 if(!module.areDependenciesLoading){
-                    //todo: is shim eval needed.
                     if(module.isShim){
-                        module.initResult = eval(module.shimConfig.exports);
+                        var x = this._resolveShim(module.name, module.shimConfig);
+                        module.initResult = x.shimResult;
                         module.isInitialized = true;
                     }else{
                         //todo: reregister all things now that the module is loaded. may need eval if shim.
@@ -234,8 +238,7 @@
 //                            modulus.config._findAndRegisterModules();
 //                        }
                         //run the module init
-                        module.initResult = module.init.apply(undefined, module.resolvedDependencies);
-                        module.isInitialized = true;
+                        this._resolveModule(module);
                     }
 
                     for(var i=0; i<module.asyncSuccessQueue.length;++i){
@@ -279,29 +282,20 @@
          * @returns {{}} - object hash with name on the left and metadata on the right. e.g. {'moduleA': {name:'moduleA', ...}, 'moduleB': {...} }
          */
         _getModules: function(arrayOfModuleNames){
-            var result = {
-                //'moduleX': {}
-            };
+            var result = {};
             for(var i=0; i < arrayOfModuleNames.length; ++i){
                 var moduleName = arrayOfModuleNames[i];
                 var module = this._modules[moduleName];
                 if(module){
                     result[module.name] = module;
-                }else{
-                    //if(this.asyncMap && this.asyncMap[moduleName]){
-                        //the requested module has not been registered yet. register it!
-                    //assume all unfound modules need to be loaded asynchronously.
+                }else{//if the module is not found/registered, register a partial version of it, and assume that it is async.
                     var partial = {
                         name: moduleName,
-                        //asyncPath:this.asyncMap[moduleName],
                         isAsync:true,
                         isPartial:true //we don't know the dependencies yet, so we have to parse after load to find out.
                     };
                     this._registerModule(partial);
                     result[moduleName] = partial;
-//                    }else{
-//                        result[moduleName] = undefined;
-//                    }
                 }
 
             }
@@ -476,6 +470,18 @@
             return shimModules;
         },
 
+        /**
+         * Calls the init function of the module and returns it's result.
+         * Assigns result to module.initResult, and sets isInitialized to true if there were no exceptions.
+         * @param module
+         */
+        _resolveModule: function(module){
+            try{
+                module.initResult = module.init.apply(null, module.resolvedDependencies);
+                module.isInitialized = true;
+            }catch(e){
+            }
+        },
         /**
          * Attempts to resolve the string exports e.g. 'Backbone' to the real value of the shim.
          * @param shimName
