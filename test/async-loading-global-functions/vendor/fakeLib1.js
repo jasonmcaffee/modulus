@@ -1,0 +1,1 @@
+window.fakeLib1 = 1;  //needs to be on window so i can delete during testing.

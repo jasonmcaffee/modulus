@@ -1,0 +1,1 @@
+window.fakeLib3 = 3;

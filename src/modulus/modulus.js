@@ -201,7 +201,7 @@
                             module.asyncComplete = true;
                             module.isAsyncInProgress = false;
                             config._executeCallbacksIfModuleIsDoneLoading(module);
-                        });
+                        }, errorback);
                     }else{
                         module.asyncComplete = true;
                         module.isAsyncInProgress = false;
@@ -605,7 +605,7 @@
         }
         var end = new Date().getTime();
         var total = end-start;
-        //log('modulus initialized in %s ms', total);
+        console.log('modulus initialized in %s ms', total);
     };
 
     /**
