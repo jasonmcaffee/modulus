@@ -191,15 +191,17 @@
             //since modules are wrapped in functions, we can load a module and its dependencies at the same time.
             this.asyncFileLoad(module.name, (function(module, config){
                 return function(){
-                    //log('async load completed for %s completed', module.name);
+                    //we don't know the dependencies of a module until it has been loaded and registered.
+                    //if using the define function (and not context) the loaded module's script is expected to have been called, and the module registered(including knowing it's dependencies)
+                    //if a context is provided, it means that the m function (define) is not being used when the script
+                    //is loaded.  We need to explicitly register the module by first finding it's function in the context.
                     if(config.context){
-                        var moduleInitFunc = config.context[module.name];
+                        var moduleInitFunc = config.context[module.name];//e.g. window.moduleA
                         var moduleFromContext = config._createModuleFromFunction({name:module.name, func:moduleInitFunc});
                         config._registerModule(moduleFromContext);
-
                     }
-                    //we don't know the dependencies of a module until it has been loaded and registered.
-                    //if the module does have dependencies
+
+                    //if the module does have dependencies, load it's dependencies and then resolve the module (call it's init)
                     if(module.dependencies && module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
                         //log('async module %s loaded but has dependencies that were found after load.', module.name);
                         config._loadModuleDependencies(module, function(module){
@@ -207,7 +209,7 @@
                             module.isAsyncInProgress = false;
                             config._executeCallbacksIfModuleIsDoneLoading(module);
                         }, errorback);
-                    }else{
+                    }else{ //no module dependencies so we can
                         module.asyncComplete = true;
                         module.isAsyncInProgress = false;
                         config._executeCallbacksIfModuleIsDoneLoading(module);
@@ -239,11 +241,6 @@
                         module.initResult = x.shimResult;
                         module.isInitialized = true;
                     }else{
-                        //if a context is provided, it means that the m function (define) is not being used when the script
-                        //is loaded.  We need to manually search the context to find new additions.
-                        //if(modulus.config.context){
-                        //    modulus.config._findAndRegisterModules();
-                        //}
                         //run the module init
                         this._resolveModule(module);
                     }

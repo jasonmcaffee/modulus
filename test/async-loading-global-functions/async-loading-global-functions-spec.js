@@ -157,7 +157,7 @@ describe("modulus async modules global functions", function(){
         });
     });
 
-    xit("should handle multiple async modules", function(){
+    it("should handle multiple async modules", function(){
         var callbackExecutedCount = 0;
         modulus.reset();
         runs(function(){
@@ -178,7 +178,7 @@ describe("modulus async modules global functions", function(){
 
 });
 
-xdescribe("modulus async shims", function(){
+describe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
 
