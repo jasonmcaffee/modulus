@@ -2,4 +2,4 @@
 *.iws
 *.ipr
 npm_modules
-modulusjs.org/logs
+*.log
