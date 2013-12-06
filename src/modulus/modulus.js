@@ -192,7 +192,12 @@
             this.asyncFileLoad(module.name, (function(module, config){
                 return function(){
                     //log('async load completed for %s completed', module.name);
+                    if(config.context){
+                        var moduleInitFunc = config.context[module.name];
+                        var moduleFromContext = config._createModuleFromFunction({name:module.name, func:moduleInitFunc});
+                        config._registerModule(moduleFromContext);
 
+                    }
                     //we don't know the dependencies of a module until it has been loaded and registered.
                     //if the module does have dependencies
                     if(module.dependencies && module.dependencies.length > 0 && !module.isDependencyLoadingComplete && !module.areDependenciesLoading){
@@ -236,9 +241,9 @@
                     }else{
                         //if a context is provided, it means that the m function (define) is not being used when the script
                         //is loaded.  We need to manually search the context to find new additions.
-                        if(modulus.config.context){
-                            modulus.config._findAndRegisterModules();
-                        }
+                        //if(modulus.config.context){
+                        //    modulus.config._findAndRegisterModules();
+                        //}
                         //run the module init
                         this._resolveModule(module);
                     }

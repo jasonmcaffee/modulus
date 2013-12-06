@@ -245,6 +245,7 @@ function moduleA($){
 }
 ```
 ### Special module processing
+NOTE: THIS FEATURE IS NOT COMPLETE YET.
 Modulus allows you to process your modules at runtime, allowing you to easily build a framework on top of it.
 
 ```javascript

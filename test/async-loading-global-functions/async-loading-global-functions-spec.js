@@ -54,7 +54,7 @@ describe("modulus async modules global functions", function(){
         }
     });
 
-    it("should support async loading of a single module with no dependencies", function(){
+    xit("should support async loading of a single module with no dependencies", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){
@@ -71,7 +71,7 @@ describe("modulus async modules global functions", function(){
         });
     });
 
-    it("it should not create an ajax request when the module has been loaded already", function(){
+    xit("it should not create an ajax request when the module has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){
@@ -118,8 +118,9 @@ describe("modulus async modules global functions", function(){
     });
 
     //we can't determine dependencies until the module has been loaded.
-    xit("it should download a module first, and then its dependencies at the same time", function(){
+    it("it should download a module first, and then its dependencies at the same time", function(){
         modulus.reset();
+        moduleA = moduleB = window.moduleA = window.moduleB = null;
         ajaxCount=0; var testCallbackCount = 0;
         var callbackExecuted = false;
         var testCallbackExecuted = false;
