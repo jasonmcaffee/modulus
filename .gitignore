@@ -3,3 +3,4 @@
 *.ipr
 npm_modules
 *.log
+node.log

@@ -46,7 +46,7 @@ app.configure(function(){
 
     //log incoming requests
     app.use(express.logger({
-        'stream' : fs.createWriteStream(__dirname+'/../node-server/logs/node.log',{flags: 'a'})
+        'stream' : fs.createWriteStream(__dirname+'/logs/node.log',{flags: 'a'})
     }));
 
 });
@@ -63,9 +63,8 @@ app.register('.html', require('ejs'));//all .html files served up will be consid
 
 //server response functions =====================================================================================================
 app.get('/', function(req,res){
-    //var userAgent = 'Mozilla/4.0 (compatible; MSIE 4.01; Windows CE; O2 Xda 2s;PPC;240x320; PPC; 240x320)';// req.headers['user-agent'];
-    //var deviceInfo = wurfl.get(userAgent);
-    console.log('jason mcaffee.com home');
+
+    console.log('modulusjs.org home');
 
     var viewModel = {
         viewModel:{
