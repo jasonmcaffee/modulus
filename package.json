@@ -20,7 +20,11 @@
         "grunt-contrib-uglify": "0.2.4",
         "grunt": "0.4.1",
         "handlebars": "1.0.12",
-        "modulusjs":"0.0.4"
+        "modulusjs":"0.0.4",
+        "express": "2.5.8",
+        "connect": "2.1.0",
+        "ejs": ">= 0.7.1",
+        "gzippo": ">= 0.1.4"
     },
     "optionalDependencies": {},
     "engines": {
