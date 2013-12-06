@@ -71,7 +71,7 @@ describe("modulus async modules global functions", function(){
         });
     });
 
-    xit("it should not create an ajax request when the module has been loaded already", function(){
+    it("it should not create an ajax request when the module has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){

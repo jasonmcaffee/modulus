@@ -234,10 +234,11 @@
                         module.initResult = x.shimResult;
                         module.isInitialized = true;
                     }else{
-                        //todo: reregister all things now that the module is loaded. may need eval if shim.
-//                        if(modulus.config.context == window){
-//                            modulus.config._findAndRegisterModules();
-//                        }
+                        //if a context is provided, it means that the m function (define) is not being used when the script
+                        //is loaded.  We need to manually search the context to find new additions.
+                        if(modulus.config.context){
+                            modulus.config._findAndRegisterModules();
+                        }
                         //run the module init
                         this._resolveModule(module);
                     }
@@ -549,6 +550,7 @@
          */
         _findAndRegisterModules:function (){
             var foundModuleFunctions = this._findModuleFunctions();
+            //todo: consider not parsing the function dependencies during this call, as this function is called every time a dependency is asynchronously loaded, and a context is provided.
             var foundModules = this._createModulesFromFunctions(foundModuleFunctions);
             if(this.shim){
                 var shimModules = this._createModulesFromShim();
