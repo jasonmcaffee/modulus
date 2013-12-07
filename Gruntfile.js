@@ -14,6 +14,10 @@ module.exports = function (grunt) {
         modulusWebsite.cssDist = dist + '/css';
         modulusWebsite.jsSrc = src + '/js';
         modulusWebsite.jsDist = dist + '/js';
+        modulusWebsite.fontSrc = src + '/fonts';
+        modulusWebsite.fontDist = dist + '/fonts';
+        modulusWebsite.imgSrc = src + '/img';
+        modulusWebsite.imgDist = dist + '/img';
     }
 
     grunt.initConfig({
@@ -27,6 +31,20 @@ module.exports = function (grunt) {
                     specs: 'test/spec/*Spec.js',
                     helpers: 'test/spec/*Helper.js'
                 }
+            }
+        },
+        copy:{
+            siteFonts:{
+                cwd:modulusWebsite.fontSrc + '/',
+                expand: true,
+                src: '**/*',
+                dest: modulusWebsite.fontDist
+            },
+            siteImages:{
+                cwd:modulusWebsite.imgSrc + '/',
+                expand: true,
+                src: '**/*',
+                dest: modulusWebsite.imgDist
             }
         },
 //        watch: {
@@ -74,6 +92,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.loadTasks('grunt-tasks/test/buildtime-project');
     grunt.loadTasks('grunt-tasks/test/buildtime-project2');
@@ -81,6 +100,7 @@ module.exports = function (grunt) {
 
     grunt.loadTasks('grunt-tasks/modulusjs.org');
 
+    grunt.registerTask('build-site', ['copy:siteFonts', 'copy:siteImages']);
 //    grunt.registerTask('test', ['jasmine']);
 //    grunt.registerTask('build', ['', 'jasmine:modulus']);
 //    grunt.registerTask('build-and-minify', ['build', 'uglify:modulus']);

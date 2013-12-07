@@ -24,7 +24,8 @@
         "express": "2.5.8",
         "connect": "2.1.0",
         "ejs": ">= 0.7.1",
-        "gzippo": ">= 0.1.4"
+        "gzippo": ">= 0.1.4",
+        "grunt-contrib-copy": "0.4.1"
     },
     "optionalDependencies": {},
     "engines": {
