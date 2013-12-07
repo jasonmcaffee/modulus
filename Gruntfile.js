@@ -4,8 +4,21 @@ module.exports = function (grunt) {
 
     var uglifyConfig = {};
 
+    var modulusWebsite = {
+        dist:'dist/modulusjs.org',
+        src: 'modulusjs.org/source'
+    };
+
+    with(modulusWebsite){
+        modulusWebsite.cssSrc = src + '/css';
+        modulusWebsite.cssDist = dist + '/css';
+        modulusWebsite.jsSrc = src + '/js';
+        modulusWebsite.jsDist = dist + '/js';
+    }
+
     grunt.initConfig({
         modulus:{
+            site: modulusWebsite
         },
         jasmine: {
             modulus:{
@@ -65,6 +78,9 @@ module.exports = function (grunt) {
     grunt.loadTasks('grunt-tasks/test/buildtime-project');
     grunt.loadTasks('grunt-tasks/test/buildtime-project2');
     grunt.loadTasks('grunt-tasks/test/buildtime-project3');
+
+    grunt.loadTasks('grunt-tasks/modulusjs.org');
+
 //    grunt.registerTask('test', ['jasmine']);
 //    grunt.registerTask('build', ['', 'jasmine:modulus']);
 //    grunt.registerTask('build-and-minify', ['build', 'uglify:modulus']);
