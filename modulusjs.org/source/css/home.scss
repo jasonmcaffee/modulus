@@ -1,4 +1,33 @@
 
+body{
+    background-color: rgb(251,251,251);
+}
+
+header{
+    background-color: rgba(241,242,242,.79);
+    height:130px;
+    border-bottom: solid rgba(209,211,212,1) 1px;
+    img{
+        height:100%;
+        width:auto;
+    }
+}
+
+.side-nav{
+    right:0%;
+    position:fixed;
+    height: 100%;
+    background-color: rgba(109,110,113,.9);
+    z-index: 3;
+    width:10%;
+    min-width:150px;
+    font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
+    font-size: 18px;
+    color:rgb(251,251,251);
+    padding: 1% 0% 1% 1%;
+}
+
+
 //#################################### RESET ###########################################################################
 *{
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
@@ -19,16 +48,34 @@ html, body{
     width:100%;
     margin:0px;
     padding:0px;
+    font-family: robotolight, "Helvetica Neue", Helvetica, arial, freesans, clean;
+}
+
+h1{
+    font-size:60px;
+}
+h1, h2, h3, h4, h5, h6{
+    font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
+    color: rgb(233,233,234);
+    margin-bottom: 0px;
+    margin-top:0px;
+    -webkit-text-stroke-width: .1px;
+    -webkit-text-stroke-color: rgba(147,149,152, .2);
+    //text-shadow: 1px 1px rgba(147,149,152,.8), -1px -1px rgba(147,149,152,.5);
+}
+
+p{
+    font-size: 21px;
 }
 
 //#################################### FONTS ###########################################################################
 @font-face {
     font-family: 'robotolight';
-    src: url('Roboto-Light-webfont.eot');
-    src: url('Roboto-Light-webfont.eot?#iefix') format('embedded-opentype'),
-    url('Roboto-Light-webfont.woff') format('woff'),
-    url('Roboto-Light-webfont.ttf') format('truetype'),
-    url('Roboto-Light-webfont.svg#robotolight') format('svg');
+    src: url('../fonts/Roboto-Light-webfont.eot');
+    src: url('../fonts/Roboto-Light-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Roboto-Light-webfont.woff') format('woff'),
+    url('../fonts/Roboto-Light-webfont.ttf') format('truetype'),
+    url('../fonts/Roboto-Light-webfont.svg#robotolight') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -36,11 +83,11 @@ html, body{
 
 @font-face {
     font-family: 'roboto_condensedregular';
-    src: url('RobotoCondensed-Regular-webfont.eot');
-    src: url('RobotoCondensed-Regular-webfont.eot?#iefix') format('embedded-opentype'),
-    url('RobotoCondensed-Regular-webfont.woff') format('woff'),
-    url('RobotoCondensed-Regular-webfont.ttf') format('truetype'),
-    url('RobotoCondensed-Regular-webfont.svg#roboto_condensedregular') format('svg');
+    src: url('../fonts/RobotoCondensed-Regular-webfont.eot');
+    src: url('../fonts/RobotoCondensed-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/RobotoCondensed-Regular-webfont.woff') format('woff'),
+    url('../fonts/RobotoCondensed-Regular-webfont.ttf') format('truetype'),
+    url('../fonts/RobotoCondensed-Regular-webfont.svg#roboto_condensedregular') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -48,11 +95,11 @@ html, body{
 
 @font-face {
     font-family: 'robotothin';
-    src: url('Roboto-Thin-webfont.eot');
-    src: url('Roboto-Thin-webfont.eot?#iefix') format('embedded-opentype'),
-    url('Roboto-Thin-webfont.woff') format('woff'),
-    url('Roboto-Thin-webfont.ttf') format('truetype'),
-    url('Roboto-Thin-webfont.svg#robotothin') format('svg');
+    src: url('../fonts/Roboto-Thin-webfont.eot');
+    src: url('../fonts/Roboto-Thin-webfont.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Roboto-Thin-webfont.woff') format('woff'),
+    url('../fonts/Roboto-Thin-webfont.ttf') format('truetype'),
+    url('../fonts/Roboto-Thin-webfont.svg#robotothin') format('svg');
     font-weight: normal;
     font-style: normal;
 
