@@ -15,6 +15,7 @@ var config = {
     viewsDirectory : __dirname + '/views/',
     port: 4010,
     publicStaticFiles :  path.resolve(__dirname + '/../dist'),
+    morePublicStaticFiles: path.resolve(__dirname + '/../dist/modulusjs.org'),
     uploadDir : path.resolve(__dirname + '/../dist') + '/uploadedFiles/'
 };
 
@@ -37,7 +38,7 @@ app.configure(function(){
 
     //gzip all static files in public folder (js, css, etc)
     app.use(gzippo.staticGzip(config.publicStaticFiles));
-
+    app.use(gzippo.staticGzip(config.morePublicStaticFiles));
     //gzips the server side template views
     app.use(connect.compress());//gzip functionality
 
