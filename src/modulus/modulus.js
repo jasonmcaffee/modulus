@@ -501,6 +501,7 @@
                 module.initResult = module.init.apply(null, module.resolvedDependencies);
                 module.isInitialized = true;
             }catch(e){
+                throw e;
             }
         },
         /**

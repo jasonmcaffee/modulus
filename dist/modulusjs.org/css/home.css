@@ -30,10 +30,22 @@ header {
   font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
   font-size: 18px;
   color: #fbfbfb;
-  padding: 1% 0% 1% 1%;
+  padding: 1% 1% 1% 1%;
   -webkit-box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75);
   -moz-box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75);
   box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75); }
+  .side-nav ul li {
+    width: 80%;
+    margin-left: 20%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; }
+    .side-nav ul li > a {
+      font-size: 80%; }
+
+.side-nav ul > a, .side-nav ul li > a {
+  color: white;
+  text-decoration: none; }
 
 .toolbar {
   display: none; }

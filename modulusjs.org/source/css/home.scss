@@ -36,10 +36,33 @@ header{
     font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
     font-size: 18px;
     color:rgb(251,251,251);
-    padding: 1% 0% 1% 1%;
+    padding: 1% 1% 1% 1%;
     -webkit-box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75);
     -moz-box-shadow:    -3px 0px 3px rgba(50, 50, 50, 0.75);
     box-shadow:         -3px 0px 3px rgba(50, 50, 50, 0.75);
+
+    ul{
+        > a{
+            @extend %nav-link;
+        }
+        li{
+            width:80%;
+            margin-left: 20%;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            overflow:hidden;
+
+            > a{
+                font-size: 80%;
+                @extend %nav-link;
+            }
+        }
+    }
+}
+
+%nav-link{
+    color: white;
+    text-decoration: none;
 }
 
 //code blocks

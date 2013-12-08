@@ -9,7 +9,7 @@
         <img src="img/header.png">
     </header>
     <!-- Side Navigation -->
-    <div class="side-nav">
+    <div id="sideNav" class="side-nav">
         <ul>
             <li>
                 Download
@@ -45,14 +45,14 @@
             Modulus provides the ability to intelligently* load module dependencies/scripts during runtime.
         </p>
 
-        <h2>Node.js Build Tool/Script Optimizer</h2>
+        <h2 id="Node.js Build Tool">Node.js Build Tool/Script Optimizer</h2>
         <p>
             You can compile your modules into one or more script files to optimize the number of http requests made at runtime.
         </p>
 
-        <h1>API</h1>
+        <h1 id="api">API</h1>
 
-        <h2>Defining Modules</h2>
+        <h2 id="Defining Modules">Defining Modules</h2>
         <p>
             There are several options for defining modules with Modulus.
         </p>
@@ -148,6 +148,122 @@
 
         </pre>
 
+        <h2>AMD</h2>
+        <p>
+            The Modulus AMD API is completely customizable, allowing you to determine any convention or configuration you'd like.<br/>
+            To get started, you'll first need to provide a 'asyncFileLoad' function.
+        </p>
+        <pre class="brush: js">
+            m.init({
+                //When a module is requested that is not found, and an asyncFileLoad function is provided, asyncFileLoad
+                //will be called so that the module can be loaded.
+                asyncFileLoad:function(moduleName, callback, errorback){
+                    var root = 'js/';                       //custom convention
+                    moduleName = this.asyncMap[moduleName]; //custom convention
+
+                    var path = root+moduleName + '.js';
+                    $.ajax({
+                        url: path,
+                        crossDomain:true, //allow local file system cross domain requests.
+                        dataType: "script",
+                        success: callback
+                    }).fail(function(err){errorback(err)});
+                },
+                //custom configuration entry to help locate modules. (You can create your own convention or configuration)
+                asyncMap:{
+                    moduleA:'moduleA'
+                }
+            });
+        </pre>
+        <h3>AMD Loading Behavior</h3>
+        <p>
+            Modulus attempts to load modules as quickly as possible by using this strategy:<br/>
+
+            Modulus will attempt to asynchronously load any module that is not currently registered (i.e. in modulus.config._modules) when asyncFileLoad is defined.<br/>
+
+            When you require a module asynchronously, the module will first be downloaded, and then it's dependencies will be downloaded simultaneously.<br/>
+
+            Note: this means that the order in which the dependencies are loaded is not guaranteed.<br/>
+
+            When you require a module that has already been loaded, a new asyncFileLoad request will not be made.<br/>
+
+            Shim entries that are asynchronously downloaded will have dependencies loaded first. (e.g. Backbone shouldn't be loaded until underscore is) <br/>
+
+            Shim entry dependencies will be downloaded simultaneously. e.g. if you require Backbone, jquery and underscore will be loaded at the same time.<br/>
+        </p>
+
+        <h1>Build Tool/Script Optimization</h1>
+        <p>
+            Modulus offers a powerful node.js module to help you optimize your project's script files into one (or more) js files.<br/>
+            Every aspect of the modulus build is customizable. Modulus exposes all functions through the config so you can override any behavior.
+        </p>
+
+        <h2>Install</h2>
+        <p>npm install modulusjs</p>
+        <h2>Build</h2>
+        <pre class="brush: js">
+            var modulus = require('modulusjs');
+            modulus.build({
+                ...
+            }, buildComplete, buildFailure);
+        </pre>
+
+        <h2>Build Configuration</h2>
+
+        <h3>Example Build Configuration</h3>
+        <pre class="brush: js">
+            modulus.build({
+                //the directory which should be scanned to find modules.
+                //baseDirectory is combined with modulePattern to form a glob pattern, which finds all modules in the project.
+                baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
+                modulePattern: '**/*.js', //glob pattern matching
+
+                //the dist configuration tells Modulus which files to combine together, and where to put the combined file(s).
+                dist:{
+                    //in this example, we demonstrate building 2 optimized files: 'global.js' and 'pageOne.js'.
+                    //global.js is placed on each page, and a page.js file should not include any modules found
+                    //in global (avoid redundancy)
+                    files:{
+                        //tell Modulus to build a pageOne.js file and distribute it to our dist directory.
+                        //in our source directory, there is a pageOne.js that starts the dependency chain.
+                        //modulus will find pageOne's dependencies, and all the dependencies of those dependencies, etc,
+                        //until all dependencies are found.
+                        //Once all dependencies are found, pageOne.js is written to the dist directory,
+                        //and will include all dependencies.
+                        './dist/test/buildtime-project/pageOne.js':{
+                            dependencies:['pageOne'], //start at module b and include all it's dependencies.
+                            //any modules that are defined in global should not be defined in pageOne.
+                            //e.g. jquery and other core modules.
+                            excludes:['global']
+                        },
+                        './dist/test/buildtime-project/global.js':{
+                            dependencies:['global']
+                        }
+                    }
+                },
+                //any modules you want to include that aren't modulus compliant.
+                //e.g. myModule($) would get the result of this path
+                shim:{
+                    '$':{
+                        path: 'test/buildtime-project/js/vendor/jquery-1.10.2.min.js',
+                        dependencies:[],
+                        exports:'$'
+                    },
+                    'Backbone':{
+                        path: 'test/buildtime-project/js/vendor/backbone-1.1.0.min.js',
+                        dependencies: ['_', '$'],
+                        exports:'Backbone'
+                    },
+                    '_':{
+                        path: 'test/buildtime-project/js/vendor/underscore-1.5.2.min.js',
+                        dependencies: [],
+                        exports:'_'
+                    }
+                }
+
+            }, buildComplete, buildError);
+        </pre>
+
     </section>
 
     <script src="js/modulus.js"></script>
@@ -162,6 +278,10 @@
                 'SyntaxHighlighterWithJsBrush':{
                     dependencies:['SyntaxHighlighter'],
                     exports:'SyntaxHighlighter'
+                },
+                '$':{
+                    dependencies:[],
+                    exports:'$'
                 }
             },
             asyncMap:{
@@ -186,6 +306,83 @@
     <script type="text/javascript">
         m(function(SyntaxHighlighterWithJsBrush){
             SyntaxHighlighterWithJsBrush.all();
+        });
+
+        //Table of Contents Module
+        m(function tableOfContents($){
+            var toc = {
+                //create links for side nav (table of contents)s
+                processHeadings: function(){
+                    var result = [], primaryHeading;
+                    $('h1, h2').each(function(i, item){  //, h3, h4, h5 only concerned with primary headings.
+                        var $item = $(item),
+                            text = $item.text();
+                        $item.attr('id', text);//set the id so #id can be used in the url.
+
+                        if(item.tagName.toLowerCase() == 'h1'){
+                            if(primaryHeading){
+                                result.push(primaryHeading);
+                            }
+                            primaryHeading = this._createHeading(text, item.tagName, text);
+                            primaryHeading.isPrimary = true;
+                        }else{
+                            //primaryHeading = primaryHeading || this._createHeading(text, item.tagName, text);
+                            primaryHeading.children.push(this._createHeading(text, item.tagName, text));
+                        }
+                    }.bind(this));
+                    result.push(primaryHeading);
+                    return result;
+                },
+                _createHeading: function(text, tagName, id){
+                    return {
+                        children: [],
+                        text: text,
+                        type: tagName,
+                        id: id
+                    };
+                }
+            };
+            return toc;
+        });
+
+        //Side Nav Module
+        m(function sideNav($, tableOfContents){
+            return {
+                renderSideNav:function(sideNavId){
+                    this.$sideNav = this.$sideNav || $('#'+sideNavId);
+                    this.headings = this.headings || tableOfContents.processHeadings();
+                    //console.log(JSON.stringify(this.headings, null, 2));
+                    var html = this._buildSideNavHtml();
+                    this.$sideNav.html(html);
+
+                },
+                _buildSideNavHtml:function(){
+                    var result = '';
+                    for(var i=0; i < this.headings.length; ++i){
+                        var headingData = this.headings[i];
+                        if(headingData.isPrimary){
+                            var childrenHtml = '';
+                            for(var x=0; x < headingData.children.length; ++x){
+                                var childHeading = headingData.children[x];
+                                var el = '<li><a href="#'+ childHeading.id +'">'+ childHeading.text +'</a></li>';
+                                childrenHtml += el;
+                            }
+                            var primaryEl = '<ul><a href="#'+headingData.id+'">'+ headingData.text +'</a>' + childrenHtml + '</ul>';
+                            result+=primaryEl;
+                        }
+                    }
+                    return result;
+                }
+            };
+        });
+
+        //Main - wait until doc ready to start processing.
+        $(function(){
+            //perform dom modifications, such as building the table of contents (side nav)
+            m(function(sideNav){
+                console.log('here')
+                sideNav.renderSideNav('sideNav');
+            });
         });
     </script>
 </body>
