@@ -3,6 +3,7 @@
 <head>
     <meta name="keywords" content="Javascript Module Definition, Module Library, Service Locator, Module Definition, Javascript Dependency Injection, Dependency Injection, Javascript IoC, Javascript Inversion of Control, Ioc, Inversion of Control, AMD, Asynchronous Module Definition, requirejs alternative, require.js alternative, require.js alternatives, Interface Injection">
     <link href="css/home.css" media="all" rel="stylesheet" type="text/css">
+    <link href="img/favicon.png" rel="shortcut icon" type="image/png">
 </head>
 <body>
     <header>
@@ -277,6 +278,17 @@
             Modulus is still in Alpha. <br/>
             For now, please refer to the <a href="https://github.com/jasonmcaffee/modulus">Github page</a> for download instructions.
         </p>
+
+        <h1>Open Source</h1>
+        <p>
+            Modulus is an open source project, and can be found on <a href="https://github.com/jasonmcaffee/modulus">Github</a>.
+        </p>
+
+        <h2>License</h2>
+        <p>
+            <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a> <br/>
+            Copyright (c) 2013 Jason McAffee
+        </p>
     </section>
 
     <script src="js/modulus.js"></script>
@@ -327,6 +339,7 @@
                 //create links for side nav (table of contents)s
                 processHeadings: function(){
                     var result = [], primaryHeading;
+                    var self = this;
                     $('h1, h2').each(function(i, item){  //, h3, h4, h5 only concerned with primary headings.
                         var $item = $(item),
                             text = $item.text();
@@ -336,13 +349,13 @@
                             if(primaryHeading){
                                 result.push(primaryHeading);
                             }
-                            primaryHeading = this._createHeading(text, item.tagName, text);
+                            primaryHeading = self._createHeading(text, item.tagName, text);
                             primaryHeading.isPrimary = true;
                         }else{
                             //primaryHeading = primaryHeading || this._createHeading(text, item.tagName, text);
-                            primaryHeading.children.push(this._createHeading(text, item.tagName, text));
+                            primaryHeading.children.push(self._createHeading(text, item.tagName, text));
                         }
-                    }.bind(this));
+                    });
                     result.push(primaryHeading);
                     return result;
                 },
