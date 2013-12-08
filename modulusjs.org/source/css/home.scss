@@ -5,7 +5,7 @@ body{
 
 header{
     background-color: rgba(241,242,242,.79);
-    height:130px;
+    height: 10%;//130px;
     border-bottom: solid rgba(209,211,212,1) 1px;
     img{
         height:100%;
@@ -16,7 +16,13 @@ header{
 .main-content{
     padding-left: 1%;
     padding-bottom: 20px;
-    //overflow-y:scroll;
+    overflow-y:scroll;
+    -webkit-overflow-scrolling:touch;
+    height:90%;
+}
+
+.main-content::-webkit-scrollbar{
+    display:none;
 }
 
 .side-nav{
@@ -42,7 +48,14 @@ header{
 }
 .syntaxhighlighter{
     @extend %round-all-by-3;
-    width:70% !important;
+    width:80% !important;
+
+    //*{
+    //    word-wrap:break-word;
+    //    text-wrap:unrestricted;
+    //    white-space:pre;
+    //}
+    //word-wrap:break-word;
 }
 
 
@@ -71,13 +84,24 @@ html, body{
 
 h1{
     font-size:60px;
+    //color: rgb(0,174,239); //blue
+    color: rgb(87,187,228); //blue
 }
 h2{
     font-size:32px;
+    //color: rgb(57,181,74); //green
+    color: rgb(65,64,66); //dark grey
+}
+h3{
+    font-size: 24px;
+    color: rgb(233,233,234); //light grey
 }
 h1, h2, h3, h4, h5, h6{
     font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
-    color: rgb(233,233,234);
+    //color: rgb(233,233,234); //light grey
+    //color: rgb(65,64,66); //dark grey
+    //color: rgb(0,174,239); //blue
+    //color: rgb(57,181,74); //green
     margin-bottom: 0px;
     margin-top:0px;
     -webkit-text-stroke-width: .1px;

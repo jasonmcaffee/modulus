@@ -3,7 +3,7 @@ body {
 
 header {
   background-color: rgba(241, 242, 242, 0.79);
-  height: 130px;
+  height: 10%;
   border-bottom: solid #d1d3d4 1px; }
   header img {
     height: 100%;
@@ -11,7 +11,13 @@ header {
 
 .main-content {
   padding-left: 1%;
-  padding-bottom: 20px; }
+  padding-bottom: 20px;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  height: 90%; }
+
+.main-content::-webkit-scrollbar {
+  display: none; }
 
 .side-nav {
   right: 0%;
@@ -33,7 +39,7 @@ header {
   display: none; }
 
 .syntaxhighlighter {
-  width: 70% !important; }
+  width: 80% !important; }
 
 * {
   -webkit-box-sizing: border-box;
@@ -57,14 +63,19 @@ html, body {
   font-family: robotolight, "Helvetica Neue", Helvetica, arial, freesans, clean; }
 
 h1 {
-  font-size: 60px; }
+  font-size: 60px;
+  color: #57bbe4; }
 
 h2 {
-  font-size: 32px; }
+  font-size: 32px;
+  color: #414042; }
+
+h3 {
+  font-size: 24px;
+  color: #e9e9ea; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
-  color: #e9e9ea;
   margin-bottom: 0px;
   margin-top: 0px;
   -webkit-text-stroke-width: .1px;
