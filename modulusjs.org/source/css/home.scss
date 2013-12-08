@@ -42,8 +42,12 @@ header{
     box-shadow:         -3px 0px 3px rgba(50, 50, 50, 0.75);
 
     ul{
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        overflow:hidden;
         > a{
             @extend %nav-link;
+
         }
         li{
             width:80%;
@@ -104,7 +108,9 @@ html, body{
     padding:0px;
     font-family: robotolight, "Helvetica Neue", Helvetica, arial, freesans, clean;
 }
-
+a{
+    color: rgb(87,187,228);
+}
 h1{
     font-size:60px;
     //color: rgb(0,174,239); //blue

@@ -34,14 +34,18 @@ header {
   -webkit-box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75);
   -moz-box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75);
   box-shadow: -3px 0px 3px rgba(50, 50, 50, 0.75); }
-  .side-nav ul li {
-    width: 80%;
-    margin-left: 20%;
+  .side-nav ul {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden; }
-    .side-nav ul li > a {
-      font-size: 80%; }
+    .side-nav ul li {
+      width: 80%;
+      margin-left: 20%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden; }
+      .side-nav ul li > a {
+        font-size: 80%; }
 
 .side-nav ul > a, .side-nav ul li > a {
   color: white;
@@ -73,6 +77,9 @@ html, body {
   margin: 0px;
   padding: 0px;
   font-family: robotolight, "Helvetica Neue", Helvetica, arial, freesans, clean; }
+
+a {
+  color: #57bbe4; }
 
 h1 {
   font-size: 60px;
