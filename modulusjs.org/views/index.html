@@ -1,25 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="keywords" content="Javascript Module Definition, Module Library, Service Locator, Module Definition, Javascript Dependency Injection, Dependency Injection, Javascript IoC, Javascript Inversion of Control, Ioc, Inversion of Control, AMD, Asynchronous Module Definition, requirejs alternative, require.js alternative, require.js alternatives, Interface Injection">
     <link href="css/home.css" media="all" rel="stylesheet" type="text/css">
 </head>
 <body>
     <header>
         <img src="img/header.png">
     </header>
-    <div class="side-nav">
-        <ul>
-            <li>
-                Download
-                <ul>
-                    <li>Minified</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-    <h1>Overview</h1>
-    <p>
-        Modulus provides your javascript application an Inversion of Control container which allows you to easily register and locate other modules.
-    </p>
+    <section class="main-content">
+
+        <!-- Side Navigation -->
+        <div class="side-nav">
+            <ul>
+                <li>
+                    Download
+                    <ul>
+                        <li>Minified</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Overview -->
+        <h1>Overview</h1>
+        <p>
+            Modulus provides your javascript application with a Service Locator which allows you to easily register and locate other modules.
+        </p>
+
+        <p>
+            Modulus simplifies your module definitions by autowiring module function parameters based on the paramater name.  <br/>
+            e.g. having a parameter called moduleA in your module function will result in modulus finding moduleA and passing it to your module function. <br/>
+
+            By ensuring that module names are unique, we can simplify resolving modules, and eliminate the need of worrying about paths, etc.
+        </p>
+
+        <h2>Service Locator</h2>
+        <p>
+            Modulus is a <a href="http://en.wikipedia.org/wiki/Service_locator_pattern">Service Locator</a>, in that it provides a central place to register your modules, and a means to find modules from within other modules.
+        </p>
+
+        <h2>AMD Loader</h2>
+        <p>
+            Modulus provides the ability to intelligently* load module dependencies/scripts during runtime.
+        </p>
+
+        <h2>Node.js Build Tool/Script Optimizer</h2>
+        <p>
+            You can compile your modules into one or more script files to optimize the number of http requests made at runtime.
+        </p>
+        <h1>API</h1>
+        <h2>Defining Modules</h2>
+        <p>
+            There are several options for defining modules with Modulus.
+        </p>
+        <pre class="brush: js">
+            //defining a module is as simple as creating a function.
+            function moduleA(){
+                return {
+                    prop1: 123
+                };
+            }
+
+            //simply by referencing moduleA, you will get its return value passed in as the parameter value.
+            function moduleB(moduleA){
+                return {
+                    prop1: moduleA.prop1 + 1
+                };
+            }
+        </pre>
+    </section>
+
+    <script src="js/shCore.js"></script>
+    <script src="js/shBrushJScript.js"></script>
+    <script type="text/javascript">
+        SyntaxHighlighter.all()
+    </script>
 </body>
 </html>

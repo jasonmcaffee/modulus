@@ -45,6 +45,12 @@ module.exports = function (grunt) {
                 expand: true,
                 src: '**/*',
                 dest: modulusWebsite.imgDist
+            },
+            siteJs:{
+                cwd:modulusWebsite.jsSrc + '/',
+                expand: true,
+                src: '**/*',
+                dest: modulusWebsite.jsDist
             }
         },
 //        watch: {
@@ -100,7 +106,7 @@ module.exports = function (grunt) {
 
     grunt.loadTasks('grunt-tasks/modulusjs.org');
 
-    grunt.registerTask('build-site', ['copy:siteFonts', 'copy:siteImages']);
+    grunt.registerTask('build-site', ['copy:siteFonts', 'copy:siteImages', 'copy:siteJs']);
 //    grunt.registerTask('test', ['jasmine']);
 //    grunt.registerTask('build', ['', 'jasmine:modulus']);
 //    grunt.registerTask('build-and-minify', ['build', 'uglify:modulus']);
