@@ -324,6 +324,7 @@
 
         /**
          * Evaluates the function as a string and parses the parameters to determine module dependencies.
+         * Returns array of strings for the params to the function.
          * @param func - the function you wish to find dependencies for.
          * @returns {Array} - string array of dependencies. e.g. ['moduleB', 'moduleC']
          */
@@ -409,7 +410,7 @@
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,
-                dependencies : this._parseFunctionDependencies(func),
+                dependencies : this._parseFunctionDependencies(func), //TODO: allow the metadata to define this.
                 resolvedDeps: undefined,
                 autoInit: moduleMeta.autoInit, //whether the module should be evaluated before any one else asks for it.
                 init: func,

@@ -25,7 +25,7 @@
 //    }
 
     var defaults = {
-        context: modulusContext, //by default we use the window for the context. e.g. function moduleA(){} ends up on the window.
+        //context: modulusContext, //by default we use the window for the context. e.g. function moduleA(){} ends up on the window.
         _modules: {
 //             'moduleX':{
 //                 name: moduleMeta.name,

@@ -125,7 +125,7 @@ describe("modulus async modules", function(){
         });
     });
 
-    it("it should not create an ajax request when the module has been loaded already", function(){
+    xit("it should not create an ajax request when the module has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){
@@ -142,7 +142,7 @@ describe("modulus async modules", function(){
         });
     });
 
-    it("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
+    xit("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
         modulus.reset();
         ajaxCount=0;
         var callbackExecuted = false;
@@ -172,7 +172,7 @@ describe("modulus async modules", function(){
     });
 
     //we can't determine dependencies until the module has been loaded.
-    it("it should download a module first, and then its dependencies at the same time", function(){
+    xit("it should download a module first, and then its dependencies at the same time", function(){
         modulus.reset();
         ajaxCount=0; var testCallbackCount = 0;
         var callbackExecuted = false;
@@ -210,7 +210,7 @@ describe("modulus async modules", function(){
         });
     });
 
-    it("should handle multiple async modules", function(){
+    xit("should handle multiple async modules", function(){
         var callbackExecutedCount = 0;
         modulus.reset();
         runs(function(){
@@ -231,7 +231,7 @@ describe("modulus async modules", function(){
 
 });
 
-describe("modulus async shims", function(){
+xdescribe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
 

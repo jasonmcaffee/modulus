@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Modulus Tests</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="test/vendor/jasmine.css">
+
+</head>
+<body>
+
+<h1>
+    Modulus Tests - Explicit Defines - Async
+</h1>
+<h3>
+    These tests test the non-built modulus functionality. (runtime only, no node.js build process)
+</h3>
+
+<!-- testing library -->
+<script src="test/vendor/jasmine.js"></script>
+<script src="test/vendor/jasmine-html.js"></script>
+
+<!-- your source libs here -->
+<script src="src/modulus/modulus.js"></script>
+<!--<script src="test/buildtime-project3/js/base/global.js"></script>-->
+<!--<script src="test/buildtime-project3/js/page/pageOne.js"></script>-->
+
+<!-- need jquery on the page so we can provide asyncFileUpload -->
+<script src="test/async-loading/vendor/jquery-1.10.2.min.js"></script>
+<!-- your specs -->
+<script src="test/explicit-defines/explicit-defines-spec.js"></script>
+
+<!-- start the tests -->
+<script>
+    var env = jasmine.getEnv();
+    env.addReporter(new jasmine.HtmlReporter());
+    env.execute();
+</script>
+</body>
+</html>
