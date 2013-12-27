@@ -608,9 +608,9 @@
             }
             modulus.anonymousInitQueue=[];
         }
-        var end = new Date().getTime();
-        var total = end-start;
-        console.log('modulus initialized in %s ms', total);
+        //var end = new Date().getTime();
+        //var total = end-start;
+        //console.log('modulus initialized in %s ms', total);
     };
 
     /**
