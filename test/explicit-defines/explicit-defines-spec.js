@@ -57,7 +57,7 @@ describe("modulus explicit defines - async", function(){
         runs(function(){
             m(function(moduleA){
                 callbackExecuted = true;
-                expect(moduleA.name).toEqual('moduleB');
+                expect(moduleA.name).toEqual('moduleA');
             });
         });
 
@@ -116,7 +116,7 @@ describe("modulus explicit defines - async", function(){
     });
 
     //we can't determine dependencies until the module has been loaded.
-    xit("it should download a module first, and then its dependencies at the same time", function(){
+    it("it should download a module first, and then its dependencies at the same time", function(){
         modulus.reset();
         ajaxCount=0; var testCallbackCount = 0;
         var callbackExecuted = false;
@@ -154,7 +154,7 @@ describe("modulus explicit defines - async", function(){
         });
     });
 
-    xit("should handle multiple async modules", function(){
+    it("should handle multiple async modules", function(){
         var callbackExecutedCount = 0;
         modulus.reset();
         runs(function(){
