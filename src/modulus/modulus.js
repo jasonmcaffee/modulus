@@ -409,7 +409,7 @@
             var module={
                 name: moduleName,
                 paths: moduleMeta.paths,
-                dependencies : this._parseFunctionDependencies(func),
+                dependencies : moduleMeta.deps || this._parseFunctionDependencies(func),
                 resolvedDeps: undefined,
                 autoInit: moduleMeta.autoInit, //whether the module should be evaluated before any one else asks for it.
                 init: func,
@@ -568,9 +568,25 @@
      * This function represents require and define.
      * If you pass in a named function, it will be defined, and the function will not be executed immediately.
      * If you pass in a unnamed function, it will act as require, and the function will be executed immediately and passed its dependencies.
+     *
+     * Provides 2 usages:
+     * 1.  m(function moduleName(dependencyName1, dependencyName2){...}, {metadata})
+     * 2.  m('moduleName', ['dependencyName1', 'dependencyName2'], function(dep1, dep2){...}, {metadata}); NOTE: name and deps properties in metadata will get overridden
      */
-    function modulus(func, metadata){
-        if(metadata){func.module = metadata;}
+    function modulus(param1, param2, param3, param4){
+        var func, metadata;
+        //handle requirejs-like syntax 'moduleid', ['deps'], function
+        //the function name and param names are ignored with this option.
+        if(typeof param1 === 'string'){
+            metadata = param4 || {};
+            metadata.name = param1;
+            metadata.deps = param2 || [];
+            func = param3;
+        }else{//default syntax of m(func(dep1, dep2){...}, {metadata})
+            func = param1;
+            metadata = param2;
+        }
+        if(metadata){func.module = metadata;}  //todo: merge metadata with existing module data?
         var module = modulus.config._createModuleFromFunction({key:func.name, func:func}, true);
 
         if(module.name){
