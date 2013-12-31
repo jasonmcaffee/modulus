@@ -16,6 +16,9 @@ module.exports = function(grunt){
         var modulus = require('../../../lib/modulus');
 
         modulus.build({
+            //we must let modulus know the namespace we use for module registry.
+            //e.g. if we use ns.moduleA = function(dep1, dep2), then we must specifiy 'ns'
+            moduleContextName: 'ns',
             //the directory which should be scanned to find modules
             baseDirectory: 'test/buildtime-project2/js', //the directory to scan for modules.
             modulePattern: '**/*.js', //glob pattern matching
@@ -23,7 +26,7 @@ module.exports = function(grunt){
                 files:{
                     './dist/test/buildtime-project2/pageOne.js':{
                         dependencies:['pageOne'], //start at module b and include all it's dependencies.
-                        excludes:['global'] //todo: for pages that have a global.js and a page.js
+                        excludes:['global']
                     },
                     './dist/test/buildtime-project2/global.js':{
                         dependencies:['global']
