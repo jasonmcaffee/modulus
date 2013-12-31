@@ -2,7 +2,7 @@ module.exports = function (grunt) {
     //modules
     var handlebars = require('handlebars');
 
-    var uglifyConfig = {};
+
 
     var modulusWebsite = {
         dist:'dist/modulusjs.org',
@@ -19,6 +19,10 @@ module.exports = function (grunt) {
         modulusWebsite.imgSrc = src + '/img';
         modulusWebsite.imgDist = dist + '/img';
     }
+
+    var uglifyConfig = {
+
+    };
 
     grunt.initConfig({
         modulus:{
@@ -66,31 +70,40 @@ module.exports = function (grunt) {
         uglify: {
             options: {
                 //http://lisperator.net/uglifyjs/compress
-                compress:{
-                    sequences     : false,  // join consecutive statemets with the “comma operator”
-                    properties    : false,  // optimize property access: a["foo"] → a.foo
-                    dead_code     : true,  // discard unreachable code
-                    drop_debugger : true,  // discard “debugger” statements
-                    unsafe        : false, // some unsafe optimizations (see below)
-                    conditionals  : false,  // optimize if-s and conditional expressions
-                    comparisons   : false,  // optimize comparisons
-                    evaluate      : false,  // evaluate constant expressions
-                    booleans      : false,  // optimize boolean expressions
-                    loops         : false,  // optimize loops
-                    unused        : true,  // drop unused variables/functions
-                    hoist_funs    : false,  // hoist function declarations
-                    hoist_vars    : false, // hoist variable declarations
-                    if_return     : false,  // optimize if-s followed by return/continue
-                    join_vars     : false,  // join var declarations
-                    cascade       : false,  // try to cascade `right` into `left` in sequences
-                    side_effects  : true,  // drop side-effect-free statements
-                    warnings      : true,  // warn about potentially dangerous optimizations/code
-                    global_defs   : {}     // global definitions
-                },
+//                compress:{
+//                    sequences     : false,  // join consecutive statemets with the “comma operator”
+//                    properties    : false,  // optimize property access: a["foo"] → a.foo
+//                    dead_code     : true,  // discard unreachable code
+//                    drop_debugger : true,  // discard “debugger” statements
+//                    unsafe        : false, // some unsafe optimizations (see below)
+//                    conditionals  : false,  // optimize if-s and conditional expressions
+//                    comparisons   : false,  // optimize comparisons
+//                    evaluate      : false,  // evaluate constant expressions
+//                    booleans      : false,  // optimize boolean expressions
+//                    loops         : false,  // optimize loops
+//                    unused        : true,  // drop unused variables/functions
+//                    hoist_funs    : false,  // hoist function declarations
+//                    hoist_vars    : false, // hoist variable declarations
+//                    if_return     : false,  // optimize if-s followed by return/continue
+//                    join_vars     : false,  // join var declarations
+//                    cascade       : false,  // try to cascade `right` into `left` in sequences
+//                    side_effects  : true,  // drop side-effect-free statements
+//                    warnings      : true,  // warn about potentially dangerous optimizations/code
+//                    global_defs   : {}     // global definitions
+//                },
 
                 report: 'gzip'
             },
-            modulus: {files: uglifyConfig}
+            modulusTest: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'dist/test',
+                        src: '**/*.js',
+                        dest: 'dist/test'
+                    }
+                ]
+            }
         }
     });
 
@@ -107,6 +120,13 @@ module.exports = function (grunt) {
     grunt.loadTasks('grunt-tasks/modulusjs.org');
 
     grunt.registerTask('build-site', ['copy:siteFonts', 'copy:siteImages', 'copy:siteJs']);
+
+    grunt.registerTask('build-test', [
+        'build-buildtime-project',
+        'build-buildtime-project2',
+        'build-buildtime-project3',
+        'uglify:modulusTest'
+    ]);
 //    grunt.registerTask('test', ['jasmine']);
 //    grunt.registerTask('build', ['', 'jasmine:modulus']);
 //    grunt.registerTask('build-and-minify', ['build', 'uglify:modulus']);
