@@ -86,6 +86,23 @@ describe("modulus explicit defines - async", function(){
         });
     });
 
+    it("it should allow for explicit requires (needed for protection against minification)", function(){
+        var callbackExecuted = false;
+        runs(function(){
+            m(function(moduleA){
+                callbackExecuted = true;
+                expect(moduleA.name).toEqual('moduleA');
+            });
+        });
+
+        waits(1000);
+
+        runs(function(){
+            expect(callbackExecuted).toEqual(true);
+            expect(ajaxCount).toEqual(1);
+        });
+    });
+
     it("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
         modulus.reset();
         ajaxCount=0;

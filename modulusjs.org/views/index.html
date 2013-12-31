@@ -65,6 +65,7 @@
                 To do the equivalent of define, simply pass in a named function to the 'm' or 'modulus' function.<br/>
                 To do the equivalent of require, simply pass in a unnamed function to the 'm' or 'modulus' function.<br/>
             </p>
+            <div style="display:none">```javascript</div>
             <pre class="brush: js">
                 //define a module named 'moduleA' by passing in a named function.
                 m(function moduleA(){
@@ -78,12 +79,13 @@
                     console.log(moduleA.prop1); //prints 123
                 });
             </pre>
-
+            <div style="display:none">```</div>
             <h3>Global Module Functions</h3>
             <p>
                 In perhaps the easiest way possible, Modulus allows you to define modules with global functions.<br/>
                 Any dependencies on other modules are simply identified via parameter names, where the parameter name matches the name of the desired module.
             </p>
+            <div style="display:none">```javascript</div>
             <pre class="brush: js">
                 //defining a module is as simple as creating a function.
                 function moduleA(){
@@ -105,12 +107,34 @@
                 //the use of global functions means that we must explicitly call init.
                 modulus.init({context:window});
             </pre>
+            <div style="display:none">```</div>
             <p>
                 When using this option for defining modules, we must explicitly call 'init' so that modulus can scan the context for modules. <br/>
                 We must also provide module metadata (via moduleB.module), and instruct Modulus to run the moduleB function once init has been called.
             </p>
 
+            <h3>Context Object</h3>
+            <p>
+                You can also choose to assign modules to a namespace/context object.
+            </p>
+            <div style="display:none">```javascript</div>
+            <pre class="brush: js">
+                var ns = {};
+                ns.moduleB = function(){
+                    return {
+                        prop1: 123
+                    };
+                };
 
+                ns.moduleB = function(moduleA){
+                    return {
+                        prop1: moduleA.prop1 + 1
+                    };
+                };
+
+                modulus.init({context:ns});
+            </pre>
+            <div style="display:none">```</div>
         <h2>Configuration</h2>
         <p>
             Modulus offers a powerful configuration that allows you to override any function within the Modulus, allowing you to completely customize behavior. <br/>
@@ -120,6 +144,7 @@
         <p>
             To shim third party libraries which do not use the Modulus convention for defining modules, we can provide a shim configuration.
         </p>
+        <div style="display:none">```javascript</div>
         <pre class="brush: js">
             //shim configuration a few libraries.
             modulus.init({
@@ -149,12 +174,14 @@
             });
 
         </pre>
+        <div style="display:none">```</div>
 
         <h2>AMD</h2>
         <p>
             The Modulus AMD API is completely customizable, allowing you to determine any convention or configuration you'd like.<br/>
             To get started, you'll first need to provide a 'asyncFileLoad' function.
         </p>
+        <div style="display:none">```javascript</div>
         <pre class="brush: js">
             m.init({
                 //When a module is requested that is not found, and an asyncFileLoad function is provided, asyncFileLoad
@@ -177,6 +204,8 @@
                 }
             });
         </pre>
+        <div style="display:none">```</div>
+
         <h3>AMD Loading Behavior</h3>
         <p>
             Modulus attempts to load modules as quickly as possible by using this strategy:<br/>
@@ -203,16 +232,18 @@
         <h2>Install</h2>
         <p>npm install modulusjs</p>
         <h2>Build</h2>
+        <div style="display:none">```javascript</div>
         <pre class="brush: js">
             var modulus = require('modulusjs');
             modulus.build({
                 ...
             }, buildComplete, buildFailure);
         </pre>
-
+        <div style="display:none">```</div>
         <h2>Build Configuration</h2>
 
         <h3>Example Build Configuration</h3>
+        <div style="display:none">```javascript</div>
         <pre class="brush: js">
             modulus.build({
                 //the directory which should be scanned to find modules.
@@ -265,6 +296,47 @@
 
             }, buildComplete, buildError);
         </pre>
+        <div style="display:none">```</div>
+
+        <h3>Build Guidelines</h3>
+        <p>Only one module per js file is allowed</p>
+        <p>The name of the file without the extension is used as the name of the module when resolving dependencies during build.</p>
+
+        <h3>Protecting Against Minification</h3>
+        <p>
+            Minifiers will rewrite param names and in some cases remove the names of functions.</br>
+            To avoid issues with minification, the build process will rewrite module definitions to use strings to explicitly define a module.
+        </p>
+        <h4>Explicit Define when using the Modulus Function</h4>
+        <div style="display:none">```javascript</div>
+        <pre class="brush: js">
+            //original
+            m(function myModule(dependency1, dependency2){...})
+            //becomes
+            m('myModule', ['dependency1', 'dependency2'], function myModule(dependency1, dependency2){...})
+        </pre>
+        <div style="display:none">```</div>
+
+        <h4>Explicit Define when using Global Functions</h4>
+        <div style="display:none">```javascript</div>
+        <pre class="brush: js">
+            //original
+            function myModule(dependency1, dependency2){...}
+            //will get this added
+            myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
+        </pre>
+        <div style="display:none">```</div>
+
+        <h4>Explicit Define when Assigning Modules to a Context</h4>
+        <div style="display:none">```javascript</div>
+        <pre class="brush: js">
+            //original
+            var ns = {};
+            ns.myModule = function (dependency1, dependency2){...}
+            //will get this added
+            ns.myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
+        </pre>
+        <div style="display:none">```</div>
 
         <h1>Try It Out</h1>
         <h2>Codio</h2>

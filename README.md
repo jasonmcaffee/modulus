@@ -1,372 +1,350 @@
-# Modulus
-Drop dead simple module definition library.
+# Modulus.js
+
+Modulus provides your javascript application with a Service Locator that allows you to easily register and locate other modules.
 
 Modulus simplifies your module definitions by autowiring module function parameters based on the paramater name.
 e.g. having a parameter called moduleA in your module function will result in modulus finding moduleA and passing it to your module function.
-
 By ensuring that module names are unique, we can simplify resolving modules, and eliminate the need of worrying about paths, etc.
 
-## Try it out!
-You can play with the specs by going [here](https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js) and selecting Project -> Fork.
+## Service Locator
 
-View the test results [here](https://codio.com/jasonmcaffee/modulus/master/preview/test-runtime-project.html)
+Modulus is a [Service Locator][1], in that it provides a central place to register your modules, and a means to find modules from within other modules.
+More specifically, Modulus is a [Dynamic Service Locator][2], as services are registered and found at runtime.
 
-##Defining Modules
-To define a module, simply create a named function:
+## AMD Loader
+
+Modulus provides the ability to intelligently* load module dependencies/scripts during runtime.
+
+You can compile your modules into one or more script files to optimize the number of http requests made at runtime.
+
+## Defining Modules
+
+There are several options for defining modules with Modulus.
+
+### Modulus Function
+
+Modulus provides a simplified version of the typical 'define' and 'require' functions found in other AMD libraries.
+To do the equivalent of define, simply pass in a named function to the 'm' or 'modulus' function.
+To do the equivalent of require, simply pass in a unnamed function to the 'm' or 'modulus' function.
+
 
 ```javascript
-//defining a module is as simple as creating a function.
-function moduleA(){
-    return {
-        prop1: 123
-    };
-}
 
-//simply by referencing moduleA, you will get its return value passed in as the parameter value.
-function moduleB(moduleA){
-    return {
-        prop1: moduleA.prop1 + 1
-    };
-}
+
+                    //define a module named 'moduleA' by passing in a named function.
+                    m(function moduleA(){
+                        return {
+                            prop1: 123
+                        };
+                    });
+
+                    //require moduleA by passing in a unnamed function with a parameter named moduleA
+                    m(function (moduleA){
+                        console.log(moduleA.prop1); //prints 123
+                    });
+
 
 ```
-### But wait, there's more!
-Modulus provides several ways of defining modules.
 
-#### via the m function
-the m function (aka modulus()) allows you to define and require modules.
-This is a good option when you have a large project and are worried about global functions getting overridden.
-```javascript
-//define by passing in named function
-m(function moduleA(){
-    return {prop1: 123};
-});
+### Global Module Functions
 
-//require by passing in non-named function
-m(function(moduleA){
-    console.log(moduleA.prop1);
-});
-```
-
-#### via a context object
-You can define all of your modules as properties of a context
-```javascript
-var ns = {};
-ns.moduleB = function(){
-    return {
-        prop1: 123
-    };
-};
-
-ns.moduleB = function(moduleA){
-    return {
-        prop1: moduleA.prop1 + 1
-    };
-};
-
-modulus.init({context:ns});
-```
-
-##Start Processing
-
-### Option 1 - module metadata
-Each module can have metadata to control behavior of modulus.
-By specifying autoInit = true, modulus knows to run the function once it's dependencies have been located.
+In perhaps the easiest way possible, Modulus allows you to define modules with global functions.
+Any dependencies on other modules are simply identified via parameter names, where the parameter name matches the name of the desired module.
 
 ```javascript
-//configure the module to execute without being required by another module first.
-moduleB.module = {
-    autoInit: true
-};
 
-//start processing
-modulus.init();
-```
-### Through the m function
-```javascript
-//require alias
-m(function(moduleB){
-    //immediately executed
-});
-m(function(moduleB){
-    //invoked once modulus.init() is called.
-}, {autoInit:true});
-```
 
-### Through the modulus.require function
-```javascript
-modulus.require(function (moduleB){
-    console.log(moduleB.prop1); //prints 124
-});
-```
+                    //defining a module is as simple as creating a function.
+                    function moduleA(){
+                        return {
+                            prop1: 123
+                        };
+                    }
 
-## AMD
-Currently the AMD functionality resides in [src/modulus/modulusAsync](src/modulus/modulusAsynch.js)
-This will likely be merged with the non async version (src/modulus/modulus.js) soon.
+                    //simply by referencing moduleA, you will get its return value passed in as the parameter value.
+                    function moduleB(moduleA){
+                        return {
+                            prop1: moduleA.prop1 %2B 1 //evaluates to 124
+                        };
+                    }
 
-If you wish to asynchronously load modules, you will need to provide an asyncFileLoad function.
+                    //let modulus know to execute moduleB once init has been called.
+                    moduleB.module = {autoInit:true};
 
-Example Project can be found [here](test/async-loading).
-[spec](test/async-loading/async-loading-spec.js)
-[test page](test-async-loading.html)
-### Example Implementation
-We can opt to create our own config entry which we can reference during asyncFileLoad.
+                    //the use of global functions means that we must explicitly call init.
+                    modulus.init({context:window});
 
-NOTE: You can create any convention or configuration that you want.  asyncFileLoad's 'this' will be the config object.
-```javascript
-modulus.init({
-    asyncMap:{
-        'Controller':'core/mvc/Controller',
-        'Model':'core/mvc/Model',
-        'View': 'core/mvc/View',
-        'log': 'core/util/log',
-        'core': 'core/core',
-        'global': 'base/global',
-        'TestOneModel': 'model/test1/TestOneModel',
-        'pageOne': 'page/pageOne',
-        '$':'vendor/jquery-1.10.2.min',
-        'Backbone':'vendor/backbone-1.1.0.min',
-        '_': 'vendor/underscore-1.5.2.min',
-        'TestOneView': 'view/test1/TestOneView',
-        'testOneController':'controller/testOneController'
-    },
-    asyncFileLoad:function(moduleName, callback, errorback){
-        var root = 'test/buildtime-project3/js/';
-        var path = root+this.asyncMap[moduleName] + '.js'; //find the path by referencing the asyncMap
-        $.ajax({
-            url: path,
-            crossDomain:true, //allow local file system cross domain requests.
-            dataType: "script",
-            success: callback
-        }).fail(function(err){errorback(err)});
-    }
-});
+
 ```
 
-### Async Loading Behavior
-Modulus attempts to load modules as quickly as possible by using this strategy:
+When using this option for defining modules, we must explicitly call 'init' so that modulus can scan the context for modules.
+We must also provide module metadata (via moduleB.module), and instruct Modulus to run the moduleB function once init has been called.
 
-Modulus will attempt to asynchronously load any module that is not currently registered (i.e. in modulus.config._modules) when asyncFileLoad is defined.
+### Context Object
 
-When you require a module asynchronously, the module will first be downloaded, and then it's dependencies will be downloaded simultaneously.
-
-Note: this means that the order in which the dependencies are loaded is not guaranteed.
-
-When you require a module that has already been loaded, a new asyncFileLoad request will not be made.
-
-Shim entries that are asynchronously downloaded will have dependencies loaded first. (e.g. Backbone shouldn't be loaded until underscore is)
-
-Shim entry dependencies will be downloaded simultaneously. e.g. if you require Backbone, jquery and underscore will be loaded at the same time.
-
-## Build Time Option
-If you choose to use the build time library, you have the option of using file names as module names instead of using the function name.
-
-This is preferred method, and eliminates the possibility of accidental overrides (someone creating two moduleA functions)
-
-### Build Configuration
-Every aspect of the modulus build is customizable.  Modulus exposes all functions through the config so you can override any behavior.
-
-#### Buildtime Project Example
-
-An example project that is built by modulus can be found [here](test/buildtime-project).
-The spec is also in this folder if you want to modify it.
-
-The grunt task used to build the project via modulus can be found [here](grunt-tasks/test/buildtime-project/build.js).
-
-The buildtime project is built to [this directory](dist/test/buildtime-project)
-
-The test page for the buildtime project can be found [here](test-buildtime-project.html).
-
-You can run the build using:
-```
-grunt build-buildtime-project
-```
+You can also choose to assign modules to a namespace/context object.
 
 ```javascript
-var modulus = require('modulusjs');
 
-modulus.build({
-    //the directory which should be scanned to find modules
-    baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
-    modulePattern: '**/*.js', //glob pattern matching
-    dist:{
-        files:{
-            './dist/test/buildtime-project/pageOne.js':{
-                dependencies:['pageOne'], //start at module b and include all it's dependencies.
-                excludes:['global'] //todo: for pages that have a global.js and a page.js
-            },
-            './dist/test/buildtime-project/global.js':{
-                dependencies:['global']
-            }
-        }
-    },
-    //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
-    shim:{
-        '$':{
-            path: 'test/buildtime-project/js/vendor/jquery-1.10.2.min.js',
-            dependencies:[],
-            exports:'$'
-        },
-        'Backbone':{
-            path: 'test/buildtime-project/js/vendor/backbone-1.1.0.min.js',
-            dependencies: ['_', '$'],
-            exports:'Backbone'
-        },
-        '_':{
-            path: 'test/buildtime-project/js/vendor/underscore-1.5.2.min.js',
-            dependencies: [],
-            exports:'_'
-        }
-    }
 
-}, buildComplete, buildError);
+                    var ns = {};
+                    ns.moduleB = function(){
+                        return {
+                            prop1: 123
+                        };
+                    };
+
+                    ns.moduleB = function(moduleA){
+                        return {
+                            prop1: moduleA.prop1 %2B 1
+                        };
+                    };
+
+                    modulus.init({context:ns});
+
+
 ```
-NOTE: currently you have to duplicate your shim configuration during runtime via modulus.init({shim:...})  (only needed if you add other 3rd party libs)
-
-### Protecting Against Minification
-Minifiers will rewrite param names and in some cases remove the names of functions.
-
-To avoid issues with minification, the build process will rewrite module definitions to use strings to explicitly define a module.
-
-e.g.
-```javascript
-m(function myModule(dependency1, dependency2){...})
-//becomes
-m('myModule', ['dependency1', 'dependency2'], function myModule(dependency1, dependency2){...})
-```
-
-or if you are using global module functions
-```javascript
-function myModule(dependency1, dependency2){...}
-//will get this added
-myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
-```
-
-
-
-This behavior can be disabled by setting protectAgainstMinification to false.
 
 ## Configuration
 
-### Shim
-Third party libraries and other modules which aren't written in the modulus format can still be used, so long as you
-provide a shim configuration.
+Modulus offers a powerful configuration that allows you to override any function within the Modulus, allowing you to completely customize behavior.
+Configuration is achieved by calling the 'init' function, and passing in an object literal with the desired settings.
 
-For example, if you wanted to use jquery as a dependency in your modules, you could create a shim:
-```javascript
-modulus.init({
-    shim:{
-        '$':{
-            dependencies:[],
-            exports: '$'
-        }
-    }
-});
+## Shim for 3rd Party Libraries
 
-function moduleA($){
-    var $body = $('body');
-}
-```
-### Special module processing
-NOTE: THIS FEATURE IS NOT COMPLETE YET.
-Modulus allows you to process your modules at runtime, allowing you to easily build a framework on top of it.
+To shim third party libraries which do not use the Modulus convention for defining modules, we can provide a shim configuration.
 
 ```javascript
-function moduleA(moduleB){..}
 
-//optional metadata
-moduleA.module = {
-    myCustomMetaData : 'widget'
-}
 
-//module metadata is passed
-modulus.on('registerModule', function(module){
-    if(module.myCustomMetaData == 'widget'){
-        handleWidgetModule(module);
-    }
-    if(module.name.indexOf('moduleA') >= 0){
-        specialProcessing(module);
-    }else if(module.path.indexOf('some/path/to/folder') >= 0){
-        specialProcessing(module);
-    }else if(module.deps.indexOf('moduleB') >= 0){
-        swapDependencies(module, 'moduleB', 'moduleBVersion2');
-    }
-});
+                //shim configuration a few libraries.
+                modulus.init({
+                    shim:{
+                        //define the jquery shim. The key '$' represents the parameter name modules will use to require jquery.
+                        //the exports represents the global variable the third party library exposes.
+                        '$':{
+                            dependencies:[],
+                            exports:'$'
+                        },
+                        '_':{
+                            dependencies: [],
+                            exports:'_'
+                        },
+                        //Backbone depends on 2 other 3rd party libraries: jquery and underscore.
+                        //We must list those as dependencies so that they are loaded before Backbone is.
+                        'Backbone':{
+                            dependencies: ['_', '$'],
+                            exports:'Backbone'
+                        }
+                    }
+                });
+
+                m(function ($, Backbone){
+                    $('#someId');
+                    console.log(Backbone.VERSION);
+                });
+
+
+
 ```
 
-##FAQ
-### Isn't it dangerous to globally define module functions?
-Perhaps, but let's consider a few scenarios.
-#### Overridding Module Functions After Init Won't Matter
-After modulus.init has been called, it doesn't matter if your module functions have been overridden with new functions.
-e.g.
+## AMD
+
+The Modulus AMD API is completely customizable, allowing you to determine any convention or configuration you'd like.
+To get started, you'll first need to provide a 'asyncFileLoad' function.
+
 ```javascript
-function moduleA(){}
-modulus.init();
-//moduleA is referenced in memory so any changes won't matter.
-moduleA = false;
-delete moduleA;
 
-modulus.require(function(moduleA){..});
-```
 
-#### What about accidentally overridding 3rd party functions
-You can load your third party libs after modules have been registered.
-e.g.
-```javascript
-//define your modules first
-function $(){} //uh oh
-modulus.register();
-//jquery code
-(function(){jquery stuff})()
-modulus.init();
-```
-####I'm still scared
-You can also prefix your module names
-```javascript
-function $moduleA($moduleB){}
-function $moduleB(){}
-```
-#### But I don't like global functions!
-Fine
-```javascript
-var namespace ={};
-namespace.moduleA = function(moduleB){};
-namespace.moduleB = function(){};
+                m.init({
+                    //When a module is requested that is not found, and an asyncFileLoad function is provided, asyncFileLoad
+                    //will be called so that the module can be loaded.
+                    asyncFileLoad:function(moduleName, callback, errorback){
+                        var root = 'js/';                       //custom convention
+                        moduleName = this.asyncMap[moduleName]; //custom convention
 
-modulus.init({context: namespace});
+                        var path = root%2BmoduleName %2B '.js';
+                        $.ajax({
+                            url: path,
+                            crossDomain:true, //allow local file system cross domain requests.
+                            dataType: "script",
+                            success: callback
+                        }).fail(function(err){errorback(err)});
+                    },
+                    //custom configuration entry to help locate modules. (You can create your own convention or configuration)
+                    asyncMap:{
+                        moduleA:'moduleA'
+                    }
+                });
+
+
 ```
 
-### I want my own module syntax!
-All functions in modulus are granular and overridable, which means you can define your modules in any way you see fit.
-```javascript
-modulus.init({
-   /**
-    * Iterates over every function defined in the specified context and determines if it should be considered
-    * a module.
-    * @param context - context which will be searched for potential module functions
-    * @returns {Array} - array of module functions
-    */
-   _findModuleFunctions: function(context){
-        //any custom logic you want to find your module functions
-        return [array, of, functions];
-   }
-});
-```
+### AMD Loading Behavior
 
-## Build time API
-### Install
-```
+Modulus attempts to load modules as quickly as possible by using this strategy:
+Modulus will attempt to asynchronously load any module that is not currently registered (i.e. in modulus.config._modules) when asyncFileLoad is defined.
+When you require a module asynchronously, the module will first be downloaded, and then it's dependencies will be downloaded simultaneously.
+Note: this means that the order in which the dependencies are loaded is not guaranteed.
+When you require a module that has already been loaded, a new asyncFileLoad request will not be made.
+Shim entries that are asynchronously downloaded will have dependencies loaded first. (e.g. Backbone shouldn't be loaded until underscore is)
+Shim entry dependencies will be downloaded simultaneously. e.g. if you require Backbone, jquery and underscore will be loaded at the same time.
+
+
+Modulus offers a powerful node.js module to help you optimize your project's script files into one (or more) js files.
+Every aspect of the modulus build is customizable. Modulus exposes all functions through the config so you can override any behavior.
+
+## Install
+
 npm install modulusjs
-```
-### Build
-Take a look at the [grunt-tasks/test](grunt-tasks/test) dir for modulus build usages.
+
+## Build
+
 ```javascript
-var modulus = require('modulusjs');
-modulus.build({
-    ...
-}, buildComplete, buildFailure);
+
+
+                var modulus = require('modulusjs');
+                modulus.build({
+                    ...
+                }, buildComplete, buildFailure);
+
+
 ```
+
+## Build Configuration
+
+### Example Build Configuration
+
+```javascript
+
+
+                modulus.build({
+                    //the directory which should be scanned to find modules.
+                    //baseDirectory is combined with modulePattern to form a glob pattern, which finds all modules in the project.
+                    baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
+                    modulePattern: '**/*.js', //glob pattern matching
+
+                    //the dist configuration tells Modulus which files to combine together, and where to put the combined file(s).
+                    dist:{
+                        //in this example, we demonstrate building 2 optimized files: 'global.js' and 'pageOne.js'.
+                        //global.js is placed on each page, and a page.js file should not include any modules found
+                        //in global (avoid redundancy)
+                        files:{
+                            //tell Modulus to build a pageOne.js file and distribute it to our dist directory.
+                            //in our source directory, there is a pageOne.js that starts the dependency chain.
+                            //modulus will find pageOne's dependencies, and all the dependencies of those dependencies, etc,
+                            //until all dependencies are found.
+                            //Once all dependencies are found, pageOne.js is written to the dist directory,
+                            //and will include all dependencies.
+                            './dist/test/buildtime-project/pageOne.js':{
+                                dependencies:['pageOne'], //start at module b and include all it's dependencies.
+                                //any modules that are defined in global should not be defined in pageOne.
+                                //e.g. jquery and other core modules.
+                                excludes:['global']
+                            },
+                            './dist/test/buildtime-project/global.js':{
+                                dependencies:['global']
+                            }
+                        }
+                    },
+                    //any modules you want to include that aren't modulus compliant.
+                    //e.g. myModule($) would get the result of this path
+                    shim:{
+                        '$':{
+                            path: 'test/buildtime-project/js/vendor/jquery-1.10.2.min.js',
+                            dependencies:[],
+                            exports:'$'
+                        },
+                        'Backbone':{
+                            path: 'test/buildtime-project/js/vendor/backbone-1.1.0.min.js',
+                            dependencies: ['_', '$'],
+                            exports:'Backbone'
+                        },
+                        '_':{
+                            path: 'test/buildtime-project/js/vendor/underscore-1.5.2.min.js',
+                            dependencies: [],
+                            exports:'_'
+                        }
+                    }
+
+                }, buildComplete, buildError);
+
+
+```
+
+### Build Guidelines
+
+Only one module per js file is allowed
+
+The name of the file without the extension is used as the name of the module when resolving dependencies during build.
+
+### Protecting Against Minification
+
+Minifiers will rewrite param names and in some cases remove the names of functions. To avoid issues with minification, the build process will rewrite module definitions to use strings to explicitly define a module.
+
+#### Explicit Define when using the Modulus Function
+
+```javascript
+
+
+                //original
+                m(function myModule(dependency1, dependency2){...})
+                //becomes
+                m('myModule', ['dependency1', 'dependency2'], function myModule(dependency1, dependency2){...})
+
+
+```
+
+#### Explicit Define when using Global Functions
+
+```javascript
+
+
+                //original
+                function myModule(dependency1, dependency2){...}
+                //will get this added
+                myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
+
+
+```
+
+#### Explicit Define when Assigning Modules to a Context
+
+```javascript
+
+
+                //original
+                var ns = {};
+                ns.myModule = function (dependency1, dependency2){...}
+                //will get this added
+                ns.myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
+
+
+```
+
+## Codio
+
+You can play with the specs by going [here][3] and selecting Project -> Fork.
+View the test results [here][4]
+
+Modulus is still in Alpha.
+For now, please refer to the [Github page][5] for download instructions.
+
+Modulus is an open source project, and can be found on [Github][5].
+
+## License
+
+[The MIT License (MIT)][6]
+Copyright (c) 2013 Jason McAffee
+
+   [1]: http://en.wikipedia.org/wiki/Service_locator_pattern
+   [2]: http://martinfowler.com/articles/injection.html
+   [3]: https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js
+   [4]: https://codio.com/jasonmcaffee/modulus/master/preview/test-runtime-project.html
+   [5]: https://github.com/jasonmcaffee/modulus
+   [6]: http://opensource.org/licenses/MIT
+
+
 ##Contribute!
 Feel free to work on any open [issues](https://github.com/jasonmcaffee/modulus/issues)
 Setup is super simple.
@@ -383,6 +361,8 @@ sudo npm install grunt-cli@0.1.9 -g
 grunt build
 ```
 ##Release Notes
+### 0.0.6
+* protection against minification for all modulus usage options.
 ### 0.0.1
 In progress.
 * Runtime configuration - basic poc of functionality working and shown on codio.
