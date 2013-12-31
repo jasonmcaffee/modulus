@@ -1,16 +1,16 @@
-m(function pageOne(global, core, testOneController){
+m("pageOne",["global","core","testOneController"], function pageOne(global, core, testOneController){
     core.log('pageOne module loaded');
     testOneController.action();
 },{autoInit:true});
 
-m(function TestOneModel(log, Model){
+m("TestOneModel",["log","Model"], function TestOneModel(log, Model){
     log('testOneModel module loaded');
     var TestOneModel = Model.extend({
 
     });
     return TestOneModel;
 });
-m(function TestOneView(View, $, core, log){
+m("TestOneView",["View","$","core","log"], function TestOneView(View, $, core, log){
     log('TestOneView module loaded');
 
     return View.extend({
@@ -28,7 +28,7 @@ m(function TestOneView(View, $, core, log){
         }
     });
 });
-m(function testOneController(core, log, TestOneView, TestOneModel){
+m("testOneController",["core","log","TestOneView","TestOneModel"], function testOneController(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
         action:function(){

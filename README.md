@@ -223,6 +223,29 @@ modulus.build({
 ```
 NOTE: currently you have to duplicate your shim configuration during runtime via modulus.init({shim:...})  (only needed if you add other 3rd party libs)
 
+### Protecting Against Minification
+Minifiers will rewrite param names and in some cases remove the names of functions.
+
+To avoid issues with minification, the build process will rewrite module definitions to use strings to explicitly define a module.
+
+e.g.
+```javascript
+m(function myModule(dependency1, dependency2){...})
+//becomes
+m('myModule', ['dependency1', 'dependency2'], function myModule(dependency1, dependency2){...})
+```
+
+or if you are using global module functions
+```javascript
+function myModule(dependency1, dependency2){...}
+//will get this added
+myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
+```
+
+
+
+This behavior can be disabled by setting protectAgainstMinification to false.
+
 ## Configuration
 
 ### Shim

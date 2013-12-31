@@ -6,6 +6,8 @@ ns.pageOne = function(global, core, testOneController){
 ns.pageOne.module = {
     autoInit: true
 };
+;pageOne.module.name = "pageOne";
+pageOne.module.deps = ["global","core","testOneController"];
 ns.TestOneModel =function(log, Model){
     log('testOneModel module loaded');
     var TestOneModel = Model.extend({
@@ -13,6 +15,7 @@ ns.TestOneModel =function(log, Model){
     });
     return TestOneModel;
 };
+;TestOneModel.module = {name:"TestOneModel", deps:["log","Model"]};
 ns.TestOneView =function(View, $, core, log){
     log('TestOneView module loaded');
 
@@ -31,6 +34,7 @@ ns.TestOneView =function(View, $, core, log){
         }
     });
 };
+;TestOneView.module = {name:"TestOneView", deps:["View","$","core","log"]};
 ns.testOneController = function(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
@@ -48,3 +52,4 @@ ns.testOneController = function(core, log, TestOneView, TestOneModel){
         }
     };
 };
+;testOneController.module = {name:"testOneController", deps:["core","log","TestOneView","TestOneModel"]};

@@ -579,7 +579,7 @@
         //the function name and param names are ignored with this option.
         if(typeof param1 === 'string'){
             metadata = param4 || {};
-            metadata.name = param1;
+            metadata.name = metadata.name || param1; //metadata name should win over build time generated.
             metadata.deps = param2 || [];
             func = param3;
         }else{//default syntax of m(func(dep1, dep2){...}, {metadata})

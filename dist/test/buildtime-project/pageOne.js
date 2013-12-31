@@ -6,6 +6,8 @@ function pageOne(global, core, testOneController){
 pageOne.module = {
     autoInit: true
 };
+;pageOne.module.name = "pageOne";
+pageOne.module.deps = ["global","core","testOneController"];
 function TestOneModel(log, Model){
     log('testOneModel module loaded');
     var TestOneModel = Model.extend({
@@ -13,6 +15,7 @@ function TestOneModel(log, Model){
     });
     return TestOneModel;
 }
+;TestOneModel.module = {name:"TestOneModel", deps:["log","Model"]};
 function TestOneView(View, $, core, log){
     log('TestOneView module loaded');
 
@@ -31,6 +34,7 @@ function TestOneView(View, $, core, log){
         }
     });
 }
+;TestOneView.module = {name:"TestOneView", deps:["View","$","core","log"]};
 function testOneController(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {
@@ -48,3 +52,4 @@ function testOneController(core, log, TestOneView, TestOneModel){
         }
     };
 }
+;testOneController.module = {name:"testOneController", deps:["core","log","TestOneView","TestOneModel"]};

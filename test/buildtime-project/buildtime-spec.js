@@ -1,5 +1,6 @@
 describe("modulus", function(){
     modulus.init({
+        context: window, //when using global functions to define our modules, we must provide a context to scan for the functions.
         //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
         shim:{
             '$':{

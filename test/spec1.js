@@ -4,7 +4,7 @@ describe("modulus", function(){
     //you can explicitly call require when needed or preferred.
     it("should support a require function which immediately resolves dependencies", function(){
         var callbackExecuted = false;
-        modulus.init();
+        modulus.init({context:window});//since we are using global functions, we must provide to scan for defined modules.
         modulus.require(function(moduleA, moduleB, moduleC){
             callbackExecuted = true;
             expect(moduleA.prop1).toEqual(123);
@@ -31,7 +31,7 @@ describe("modulus", function(){
 
         expect(callbackExecuted).toEqual(false);
 
-        modulus.init();
+        modulus.init({context:window});//since we are using global functions, we must provide to scan for defined modules.
 
         expect(callbackExecuted).toEqual(true);
     });
@@ -44,12 +44,12 @@ describe("modulus", function(){
             return {propA:123};
         }, {autoInit:true});
 
-        modulus.init();
+        modulus.init({context:window});//since we are using global functions, we must provide to scan for defined modules.
         expect(called).toEqual(true);
     });
     
     it("should only call a module's init once", function(){
-        modulus.init();
+        modulus.init({context:window});//since we are using global functions, we must provide to scan for defined modules.
         modulus.require(function(moduleC){
             expect(moduleC).toEqual(2); //since we call init again, count is 2 at this point
         });
@@ -139,20 +139,9 @@ describe("modulus", function(){
             }
         });
 
-        modulus.init({});
+        modulus.init({context:window});
 
         expect(wasCalled).toEqual(true);
         expect(count).toEqual(1);
-    });
-});
-
-describe("modulus - internal", function(){
-    it("should find modulus modules declared in the global scope", function(){
-        expect(modulus.config._modules.moduleA.initResult.prop1).toEqual(123);
-        expect(modulus.config._modules.moduleB.initResult.b).toEqual('this i b');
-    });
-
-    it("should ensure that modules get their dependencies via params to module function", function(){
-        expect(modulus.config._modules.moduleA.initResult.moduleB).toEqual(modulus.config._modules.moduleB.initResult);
     });
 });
