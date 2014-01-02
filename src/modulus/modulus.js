@@ -564,24 +564,30 @@
     };
 
     /**
-     * The modulus.
-     * This function represents require and define.
+     * The modulus function.
+     * This function represents several options/method signatures which achieve equivalents of traditional require and define functions.
      * If you pass in a named function, it will be defined, and the function will not be executed immediately.
      * If you pass in a unnamed function, it will act as require, and the function will be executed immediately and passed its dependencies.
      *
-     * Provides 2 usages:
-     * 1.  m(function moduleName(dependencyName1, dependencyName2){...}, {metadata})
-     * 2.  m('moduleName', ['dependencyName1', 'dependencyName2'], function(dep1, dep2){...}, {metadata}); NOTE: name and deps properties in metadata will get overridden
+     * Usages:
+     * 1. normal define : m(function moduleName(dependencyName1, dependencyName2){...}, {metadata})
+     * 2. explicit define :  m('moduleName', ['dependencyName1', 'dependencyName2'], function(dep1, dep2){...}, {metadata}); NOTE: name and deps properties in metadata will get overridden
+     * 3. normal require: m(function (dependencyName1, dependencyName2){...}
+     * 4. explicit require: m(['dependencyName1', 'dependencyName2'], function (dep1, dep2){...});
      */
     function modulus(param1, param2, param3, param4){
         var func, metadata;
         //handle requirejs-like syntax 'moduleid', ['deps'], function
         //the function name and param names are ignored with this option.
-        if(typeof param1 === 'string'){
+        if(typeof param1 === 'string'){   //explicit define   m('moduleName', ['dep1', 'dep2], function moduleName(dep1, dep2){...}
             metadata = param4 || {};
             metadata.name = metadata.name || param1; //metadata name should win over build time generated.
             metadata.deps = param2 || [];
             func = param3;
+        }else if(typeof param1 === 'object'){   //explicit require m(['dep1'], function (dep1){...}
+            metadata = param3 || {};
+            metadata.deps = param1 || [];
+            func = param2;
         }else{//default syntax of m(func(dep1, dep2){...}, {metadata})
             func = param1;
             metadata = param2;
@@ -589,16 +595,14 @@
         if(metadata){func.module = metadata;}  //todo: merge metadata with existing module data?
         var module = modulus.config._createModuleFromFunction({key:func.name, func:func}, true);
 
-        if(module.name){
+        if(module.name){  //define
             modulus.config._registerModule(module);
-//            if(module.module && module.module.autoInit){
-//                //modulus.config._initModule(module);  add to queue.
-//            }
-        }else{
-            //modulus.config._initModule(module);
+        }else{  //require
+            //requires should get initted immediately, unless the module has metadata and has set autoInit to true.
             if(!func.module || (func.module && !func.module.autoInit)){  //if autoInit is specified, wait until modulus.init is called.
                 modulus.config._initModule(module);
             }
+            //when the module metadata specifies autoInit, we should add it to an array and init it once modulus.init() is called.
             if(func.module && func.module.autoInit){
                 modulus.anonymousInitQueue = modulus.anonymousInitQueue || [];
                 modulus.anonymousInitQueue.push(module);

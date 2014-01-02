@@ -5,21 +5,6 @@ describe("modulus explicit defines - async", function(){
     var testCallback;
     modulus.reset();
     modulus.init({
-        //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
-        shim:{
-            '$':{
-                dependencies:[],
-                exports:'$'
-            },
-            'Backbone':{
-                dependencies: ['_', '$'],
-                exports:'Backbone'
-            },
-            '_':{
-                dependencies: [],
-                exports:'_'
-            }
-        },
         //we can optionally use our own config to map module names to paths.
         asyncMap:{
             //since jquery is already on the test page, we won't need to load it again.
@@ -46,18 +31,18 @@ describe("modulus explicit defines - async", function(){
                     setTimeout(function(){
 
                         callback();
-                    }, Math.floor(Math.random()*500));
+                    }, Math.floor(Math.random()*100));
                 }
             }).fail(function(err){errorback(err)});
         }
     });
 
-    it("should support async loading of a single module with no dependencies", function(){
+    it("explicit require: should support async loading of a single module with no dependencies", function(){
         var callbackExecuted = false;
         runs(function(){
-            m(function(moduleA){
+            m(['moduleA'], function(modA){
                 callbackExecuted = true;
-                expect(moduleA.name).toEqual('moduleA');
+                expect(modA.name).toEqual('moduleA');
             });
         });
 
@@ -69,12 +54,12 @@ describe("modulus explicit defines - async", function(){
         });
     });
 
-    it("it should not create an ajax request when the module has been loaded already", function(){
+    it("explicit require: it should not create an ajax request when the module has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
-            m(function(moduleA){
+            m(['moduleA'], function(modA){
                 callbackExecuted = true;
-                expect(moduleA.name).toEqual('moduleA');
+                expect(modA.name).toEqual('moduleA');
             });
         });
 
@@ -86,24 +71,7 @@ describe("modulus explicit defines - async", function(){
         });
     });
 
-    it("it should allow for explicit requires (needed for protection against minification)", function(){
-        var callbackExecuted = false;
-        runs(function(){
-            m(function(moduleA){
-                callbackExecuted = true;
-                expect(moduleA.name).toEqual('moduleA');
-            });
-        });
-
-        waits(1000);
-
-        runs(function(){
-            expect(callbackExecuted).toEqual(true);
-            expect(ajaxCount).toEqual(1);
-        });
-    });
-
-    it("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
+    it("explicit require: it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
         modulus.reset();
         ajaxCount=0;
         var callbackExecuted = false;
@@ -116,10 +84,10 @@ describe("modulus explicit defines - async", function(){
         };
 
         runs(function(){
-            m(function(moduleA, moduleB){
+            m(['moduleA', 'moduleB'], function(a, b){
                 callbackExecuted = true;
-                expect(moduleA.name).toEqual('moduleA');
-                expect(moduleB.name).toEqual('moduleB');
+                expect(a.name).toEqual('moduleA');
+                expect(b.name).toEqual('moduleB');
             });
         });
 
@@ -133,7 +101,7 @@ describe("modulus explicit defines - async", function(){
     });
 
     //we can't determine dependencies until the module has been loaded.
-    it("it should download a module first, and then its dependencies at the same time", function(){
+    it("explict require: it should download a module first, and then its dependencies at the same time", function(){
         modulus.reset();
         ajaxCount=0; var testCallbackCount = 0;
         var callbackExecuted = false;
@@ -155,10 +123,10 @@ describe("modulus explicit defines - async", function(){
         };
 
         runs(function(){
-            m(function(moduleAandB){
+            m(['moduleAandB'], function(modAandB){
                 callbackExecuted = true;
-                expect(moduleAandB.moduleA.name).toEqual('moduleA');
-                expect(moduleAandB.moduleB.name).toEqual('moduleB');
+                expect(modAandB.moduleA.name).toEqual('moduleA');
+                expect(modAandB.moduleB.name).toEqual('moduleB');
             });
         });
 
@@ -171,14 +139,16 @@ describe("modulus explicit defines - async", function(){
         });
     });
 
-    it("should handle multiple async modules", function(){
+    it("explict require: should handle multiple async modules", function(){
         var callbackExecutedCount = 0;
         modulus.reset();
         runs(function(){
-            m(function(moduleAandB, moduleA, moduleB){
+            m(['moduleAandB', 'moduleA', 'moduleB'], function(moduleAandB, moduleA, moduleB){
                 callbackExecutedCount++;
                 expect(moduleAandB.moduleA.name).toEqual('moduleA');
                 expect(moduleAandB.moduleB.name).toEqual('moduleB');
+                expect(moduleA.name).toEqual('moduleA');
+                expect(moduleB.name).toEqual('moduleB');
             });
         });
 
