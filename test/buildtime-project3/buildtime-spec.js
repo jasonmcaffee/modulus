@@ -21,7 +21,8 @@ describe("modulus", function(){
     it("should support a require function which resolves dependencies", function(){
         var callbackExecuted = false;
 
-        modulus.require(function(pageOne){
+        //pageOne uses define instead of require as we need to start processing here, after the html has been setup.
+        modulus.require(function(global){
             callbackExecuted = true;
         });
 

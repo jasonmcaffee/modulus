@@ -40,7 +40,7 @@ m("testOneController",["core","log","TestOneView","TestOneModel"], function test
         }
     };
 });
-m("pageOne",["global","core","testOneController"], function(global, core, testOneController){
+m(["global","core","testOneController"], function (global, core, testOneController){
     core.log('pageOne module loaded');
     testOneController.action();
 });
