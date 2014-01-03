@@ -1,3 +1,4 @@
+var ns=ns || {};//each module must do this when using the context/namespace option of modulus.
 ns.testOneController = function(core, log, TestOneView, TestOneModel){
     log('testOneController module loaded');
     return {

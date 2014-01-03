@@ -1,3 +1,4 @@
+var ns=ns || {};//each module must do this when using the context/namespace option of modulus.
 ns.pageOne = function(global, core, testOneController){
     core.log('pageOne module loaded');
     testOneController.action();
