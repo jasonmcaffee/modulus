@@ -1,34 +1,11 @@
-describe("modulus", function(){
-    modulus.init({
-        context: window.ns, //normally this would be just 'ns', but since we are in jasmine we have to reference window.
-        //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
-        shim:{
-            '$':{
-                dependencies:[],
-                exports:'$'
-            },
-            'Backbone':{
-                dependencies: ['_', '$'],
-                exports:'Backbone'
-            },
-            '_':{
-                dependencies: [],
-                exports:'_'
-            }
-        }
-    });
-
+describe("modulus project 2", function(){
+    m.init({context:ns});
     //you can explicitly call require when needed or preferred.
-    it("should support a require function which resolves dependencies", function(){
-        var callbackExecuted = false;
-
-        modulus.require(function(pageOne){
-            callbackExecuted = true;
-        });
-
-        expect(callbackExecuted).toEqual(true);
+    it("should render a View, initialized by pageOne.js require call", function(){
+        var expectedText = 'Test One View Successfully Rendered HereTestOneView received change event from controller and rendered this';
+        var generatedText = $('#testViewDiv').text();
+        expect(generatedText).toEqual(expectedText);
     });
-
 //    it("should only call a module's init once", function(){
 //        modulus.init();
 //        modulus.require(function(moduleC){

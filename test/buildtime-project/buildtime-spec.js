@@ -1,32 +1,13 @@
 describe("modulus", function(){
     modulus.init({
-        context: window, //when using global functions to define our modules, we must provide a context to scan for the functions.
-        //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
-        shim:{
-            '$':{
-                dependencies:[],
-                exports:'$'
-            },
-            'Backbone':{
-                dependencies: ['_', '$'],
-                exports:'Backbone'
-            },
-            '_':{
-                dependencies: [],
-                exports:'_'
-            }
-        }
+        context: window //when using global functions to define our modules, we must provide a context to scan for the functions
     });
 
     //you can explicitly call require when needed or preferred.
-    it("should support a require function which resolves dependencies", function(){
-        var callbackExecuted = false;
-
-        modulus.require(function(pageOne){
-            callbackExecuted = true;
-        });
-
-        expect(callbackExecuted).toEqual(true);
+    it("should render a View, initialized by pageOne.js require call", function(){
+        var expectedText = 'Test One View Successfully Rendered HereTestOneView received change event from controller and rendered this';
+        var generatedText = $('#testViewDiv').text();
+        expect(generatedText).toEqual(expectedText);
     });
 
 //    it("should only call a module's init once", function(){
