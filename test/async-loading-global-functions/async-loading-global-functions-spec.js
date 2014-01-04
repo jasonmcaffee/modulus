@@ -54,7 +54,7 @@ describe("modulus async modules global functions", function(){
         }
     });
 
-    xit("should support async loading of a single module with no dependencies", function(){
+    it("should support async loading of a single module with no dependencies", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){
@@ -71,7 +71,7 @@ describe("modulus async modules global functions", function(){
         });
     });
 
-    xit("it should not create an ajax request when the module has been loaded already", function(){
+    it("it should not create an ajax request when the module has been loaded already", function(){
         var callbackExecuted = false;
         runs(function(){
             m(function(moduleA){
@@ -88,7 +88,7 @@ describe("modulus async modules global functions", function(){
         });
     });
 
-    xit("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
+    it("it should download multiple modules at the same time (not wait for one to load before the other) and callback when both are loaded", function(){
         modulus.reset();
         ajaxCount=0;
         var callbackExecuted = false;
@@ -178,6 +178,7 @@ describe("modulus async modules global functions", function(){
 
 });
 
+var fakeWindow = fakeWindow || {};//ie8 cant delete props from window.
 describe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
@@ -186,15 +187,22 @@ describe("modulus async shims", function(){
         ajaxCount = 0;
         testCallback = null;
         modulus.reset();
-        delete window.fakeLib2and3;
-        delete window.fakeLib1and2and3and4;
-        delete window.fakeLib1;
-        delete window.fakeLib2;
-        delete window.fakeLib3;
-        delete window.fakeLib4;
-        delete window._;
-        delete window.Backbone;
+        //we have to delete as modulus iterates of object properties, and doesn't care about the value (undefineds are allowed).
+        //if the property name exists, modulus assumes it doesn't need to be loaded.
+        //issues in ie8
+        //http://perfectionkills.com/understanding-delete/#ie_bugs
+        try{delete fakeWindow.fakeLib2and3;}catch(e){}
+        try{delete fakeWindow.fakeLib1and2and3and4;}catch(e){}
+        try{delete fakeWindow.fakeLib1;}catch(e){}
+        try{delete fakeWindow.fakeLib2;}catch(e){}
+        try{delete fakeWindow.fakeLib3;}catch(e){}
+        try{delete fakeWindow.fakeLib4; }catch(e){}
+        try{delete fakeWindow._;  }catch(e){}
+        try{delete fakeWindow.Backbone; }catch(e){}
+
+
         modulus.init({
+            _shimContext: fakeWindow,//fix for ie8 bug not being able to delete window.prop
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
                 '$':{
