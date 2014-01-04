@@ -444,6 +444,9 @@ sudo npm install grunt-cli@0.1.9 -g
 grunt build
 ```
 ##Release Notes
+### 0.0.8
+* Better reorder of modules. modules now ordered in dependency order (least dependend on top). A module's dependencies will always be before the module. (not always needed, but good for requires)
+* Generating and appending shim functions. e.g. m('$', [], function(){ return $;}  is added when jquery is shimmed.
 ### 0.0.6
 * protection against minification for all modulus usage options.
 ### 0.0.1
