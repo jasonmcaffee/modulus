@@ -1,6 +1,8 @@
 # Modulus.js
 
-[http://modulusjs.org](modulusjs.org)
+[http://modulusjs.org](http://modulusjs.org)
+
+# Overview
 
 Modulus provides your javascript application with a Service Locator that allows you to easily register and locate other modules.
 
@@ -10,14 +12,18 @@ By ensuring that module names are unique, we can simplify resolving modules, and
 
 ## Service Locator
 
-Modulus is a [Service Locator][1], in that it provides a central place to register your modules, and a means to find modules from within other modules.
-More specifically, Modulus is a [Dynamic Service Locator][2], as services are registered and found at runtime.
+Modulus is a [Service Locator][2], in that it provides a central place to register your modules, and a means to find modules from within other modules.
+More specifically, Modulus is a [Dynamic Service Locator][3], as services are registered and found at runtime.
 
 ## AMD Loader
 
 Modulus provides the ability to intelligently* load module dependencies/scripts during runtime.
 
+## Node.js Build Tool/Script Optimizer
+
 You can compile your modules into one or more script files to optimize the number of http requests made at runtime.
+
+# API
 
 ## Defining Modules
 
@@ -218,6 +224,8 @@ Shim entries that are asynchronously downloaded will have dependencies loaded fi
 Shim entry dependencies will be downloaded simultaneously. e.g. if you require Backbone, jquery and underscore will be loaded at the same time.
 
 
+# Build Tool/Script Optimization
+
 Modulus offers a powerful node.js module to help you optimize your project's script files into one (or more) js files.
 Every aspect of the modulus build is customizable. Modulus exposes all functions through the config so you can override any behavior.
 The build tool's primary function is finding module dependencies and combining modules together into 1 or more js files.
@@ -405,27 +413,34 @@ Modulus will also rewrite nested requires, since they can be affected by minific
 
 ```
 
+# Try It Out
+
 ## Codio
 
-You can play with the specs by going [here][3] and selecting Project -> Fork.
-View the test results [here][4]
+You can play with the specs by going [here][4] and selecting Project -> Fork.
+View the test results [here][5]
+
+# Download
 
 Modulus is still in Alpha.
-For now, please refer to the [Github page][5] for download instructions.
+For now, please refer to the [Github page][6] for download instructions.
 
-Modulus is an open source project, and can be found on [Github][5].
+# Open Source
+
+Modulus is an open source project, and can be found on [Github][6].
 
 ## License
 
-[The MIT License (MIT)][6]
+[The MIT License (MIT)][7]
 Copyright (c) 2013 Jason McAffee
 
-   [1]: http://en.wikipedia.org/wiki/Service_locator_pattern
-   [2]: http://martinfowler.com/articles/injection.html
-   [3]: https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js
-   [4]: https://codio.com/jasonmcaffee/modulus/master/preview/test-runtime-project.html
-   [5]: https://github.com/jasonmcaffee/modulus
-   [6]: http://opensource.org/licenses/MIT
+   [1]: http://modulusjs.org/img/header.png
+   [2]: http://en.wikipedia.org/wiki/Service_locator_pattern
+   [3]: http://martinfowler.com/articles/injection.html
+   [4]: https://codio.com/jasonmcaffee/modulus/master/tree/test/spec1.js
+   [5]: https://codio.com/jasonmcaffee/modulus/master/preview/test-runtime-project.html
+   [6]: https://github.com/jasonmcaffee/modulus
+   [7]: http://opensource.org/licenses/MIT
 
 
 ##Contribute!
@@ -448,8 +463,12 @@ grunt build
 * Better reorder of modules. modules now ordered in dependency order (least dependend on top). A module's dependencies will always be before the module. (not always needed, but good for requires)
 * Generating and appending shim functions. e.g. m('$', [], function(){ return $;}  is added when jquery is shimmed.
 
+### 0.0.7
+* Explicit require api. e.g. m(['dep1', 'dep2'], function(dep1, dep2){...});
+
 ### 0.0.6
 * protection against minification for all modulus usage options.
+* Explicit define api. e.g. m('moduleName', ['dep1', 'dep2'], function moduleName(dep1, dep2){...});
 
 ### 0.0.1
 In progress.
