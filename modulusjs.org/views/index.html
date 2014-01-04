@@ -64,6 +64,7 @@
                 Modulus provides a simplified version of the typical 'define' and 'require' functions found in other AMD libraries.<br/>
                 To do the equivalent of define, simply pass in a named function to the 'm' or 'modulus' function.<br/>
                 To do the equivalent of require, simply pass in a unnamed function to the 'm' or 'modulus' function.<br/>
+                Modulus can parse the function name and parameters, thus reducing the amount of boilerplate code you need to write.
             </p>
             <div style="display:none">```javascript</div>
             <pre class="brush: js">
@@ -80,6 +81,29 @@
                 });
             </pre>
             <div style="display:none">```</div>
+
+            <h3>Modulus Function - Explicit Define and Require</h3>
+            <p>
+                You can also opt to use a requirejs-like api, and explicitly define and require modules.<br/>
+                Although, this api is primarily used by the modulus build when protectAgainstMinification is true (default). <br/>
+                Since minifiers rename parameter names and remove function names, modulus provides an API which accepts a string for the module name, and an array of string names for the dependencies.
+            </p>
+            <div style="display:none">```javascript</div>
+            <pre class="brush: js">
+                //define a module named 'moduleA' by passing in a named function.
+                m('moduleA', ['dep1'], function moduleA(dep1){
+                    return {
+                        prop1: 123
+                    };
+                });
+
+                //require moduleA by passing in a unnamed function with a parameter named moduleA
+                m(['moduleA'], function (moduleA){
+                    console.log(moduleA.prop1); //prints 123
+                });
+            </pre>
+            <div style="display:none">```</div>
+
             <h3>Global Module Functions</h3>
             <p>
                 In perhaps the easiest way possible, Modulus allows you to define modules with global functions.<br/>
@@ -135,18 +159,21 @@
                 modulus.init({context:ns});
             </pre>
             <div style="display:none">```</div>
-        <h2>Configuration</h2>
+
+
+        <h2>Runtime Configuration</h2>
         <p>
             Modulus offers a powerful configuration that allows you to override any function within the Modulus, allowing you to completely customize behavior. <br/>
             Configuration is achieved by calling the 'init' function, and passing in an object literal with the desired settings.
         </p>
-        <h2>Shim for 3rd Party Libraries</h2>
+        <h3>Shim for 3rd Party Libraries</h3>
         <p>
-            To shim third party libraries which do not use the Modulus convention for defining modules, we can provide a shim configuration.
+            To shim third party libraries which do not use the Modulus convention for defining modules, we can provide a shim configuration.  <br/>
+            NOTE: You do not need to specify a runtime shim config if you've specified one in your build configuration.
         </p>
         <div style="display:none">```javascript</div>
         <pre class="brush: js">
-            //shim configuration a few libraries.
+            //shim configuration for a few common libraries.
             modulus.init({
                 shim:{
                     //define the jquery shim. The key '$' represents the parameter name modules will use to require jquery.
@@ -176,7 +203,7 @@
         </pre>
         <div style="display:none">```</div>
 
-        <h2>AMD</h2>
+        <h3>AMD</h3>
         <p>
             The Modulus AMD API is completely customizable, allowing you to determine any convention or configuration you'd like.<br/>
             To get started, you'll first need to provide a 'asyncFileLoad' function.
@@ -206,7 +233,7 @@
         </pre>
         <div style="display:none">```</div>
 
-        <h3>AMD Loading Behavior</h3>
+        <h4>AMD Loading Behavior</h4>
         <p>
             Modulus attempts to load modules as quickly as possible by using this strategy:<br/>
 
@@ -226,11 +253,16 @@
         <h1>Build Tool/Script Optimization</h1>
         <p>
             Modulus offers a powerful node.js module to help you optimize your project's script files into one (or more) js files.<br/>
-            Every aspect of the modulus build is customizable. Modulus exposes all functions through the config so you can override any behavior.
+            Every aspect of the modulus build is customizable. Modulus exposes all functions through the config so you can override any behavior.<br/>
+            The build tool's primary function is finding module dependencies and combining modules together into 1 or more js files. <br/>
+            This helps in optimizing your web application, as it results in fewer http requests.
         </p>
 
         <h2>Install</h2>
+        <div style="display:none">```</div>
         <p>npm install modulusjs</p>
+        <div style="display:none">```</div>
+
         <h2>Build</h2>
         <div style="display:none">```javascript</div>
         <pre class="brush: js">
@@ -240,7 +272,25 @@
             }, buildComplete, buildFailure);
         </pre>
         <div style="display:none">```</div>
+
         <h2>Build Configuration</h2>
+
+        <h3>Shim</h3>
+        <p>
+           Any scripts which do not follow the modulus convention for registering modules (e.g. third party libs) can be shimmed. <br/>
+           Shimming allows us to reference these third party libs as we would any other module in modulus. <br/>
+           When a shim is specified for the build configuration, modulus will generate and append a call to modulus which specifies the module's name, dependencies, and a function which returns the global export of the library.
+        </p>
+        <h4>Example: Generated Modulus Function Call for jQuery</h4>
+        <div style="display:none">```javascript</div>
+        <pre class="brush: js">
+            (function jquerySrcCode(){...})();
+
+            //generated modulus function call for jquery shim
+            m('$', [], function(){ return $;});
+        </pre>
+        <div style="display:none">```</div>
+
 
         <h3>Example Build Configuration</h3>
         <div style="display:none">```javascript</div>
@@ -250,6 +300,12 @@
                 //baseDirectory is combined with modulePattern to form a glob pattern, which finds all modules in the project.
                 baseDirectory: 'test/buildtime-project/js', //the directory to scan for modules.
                 modulePattern: '**/*.js', //glob pattern matching
+
+                //modulus typically depends on function names and param names to resolve dependencies and register modules.
+                //since minifiers can rename params, as well as remove function names, we can ensure modulus still functions
+                //by rewriting the modulus function calls to use the expicit define api.
+                //e.g. m(function myModule(dep1){...}); gets rewritten to m('myModule', ['dep1'], function(dep1){...});
+                protectAgainstMinification: true,
 
                 //the dist configuration tells Modulus which files to combine together, and where to put the combined file(s).
                 dist:{
@@ -337,6 +393,30 @@
             ns.myModule.module = {name: 'myModule', deps:['dependency1', 'dependency2']};
         </pre>
         <div style="display:none">```</div>
+
+        <h4>Nested Requires</h4>
+        <p>
+            Modulus will also rewrite nested requires, since they can be affected by minification.
+        </p>
+        <div style="display:none">```javascript</div>
+        <pre class="brush: js">
+            //original
+            m(function myModule(dependency1, dependency2){
+                return {
+                    //download a module/script only when needed (nested require dependencies are not included in the build)
+                    nestedRequire: function(){
+                        //original
+                        m(function(someModule){...});
+                        //becomes
+                        m(['someModule'], function(someModule){...});
+                    }
+                };
+            });
+            //becomes
+            m('myModule', ['dependency1', 'dependency2'], function myModule(dependency1, dependency2){...})
+        </pre>
+        <div style="display:none">```</div>
+
 
         <h1>Try It Out</h1>
         <h2>Codio</h2>
