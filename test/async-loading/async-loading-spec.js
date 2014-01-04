@@ -55,7 +55,7 @@
 //});
 
 //i suspect the ajaxFileLoad is interfering with above test.
-xdescribe("modulus async modules", function(){
+describe("modulus async modules", function(){
 
     var ajaxCount = 0;
     var testCallback;
@@ -231,6 +231,7 @@ xdescribe("modulus async modules", function(){
 
 });
 
+var fakeWindow = fakeWindow || {};//ie8 cant delete props from window.
 describe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
@@ -239,19 +240,21 @@ describe("modulus async shims", function(){
         ajaxCount = 0;
         testCallback = null;
         modulus.reset();
+
         //we have to delete as modulus iterates of object properties, and doesn't care about the value (undefineds are allowed).
         //if the property name exists,
         //issues in ie8
         //http://perfectionkills.com/understanding-delete/#ie_bugs
-        try{window['fakeLib2and3'] = undefined; delete window.fakeLib2and3;}catch(e){}
-        try{delete window.fakeLib1and2and3and4;}catch(e){}
-        try{delete window.fakeLib1;}catch(e){}
-        try{delete window.fakeLib2;}catch(e){}
-        try{delete window.fakeLib3;}catch(e){}
-        try{delete window.fakeLib4; }catch(e){}
-        try{delete window._;  }catch(e){}
-        try{delete window.Backbone; }catch(e){}
+        try{delete fakeWindow.fakeLib2and3;}catch(e){}
+        try{delete fakeWindow.fakeLib1and2and3and4;}catch(e){}
+        try{delete fakeWindow.fakeLib1;}catch(e){}
+        try{delete fakeWindow.fakeLib2;}catch(e){}
+        try{delete fakeWindow.fakeLib3;}catch(e){}
+        try{delete fakeWindow.fakeLib4; }catch(e){}
+        try{delete fakeWindow._;  }catch(e){}
+        try{delete fakeWindow.Backbone; }catch(e){}
         modulus.init({
+            _shimContext: fakeWindow,
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
                 '$':{
@@ -464,6 +467,7 @@ describe("modulus async shims", function(){
         runs(function(){
             m(function(_){
                 callbackCount++;
+                if(!_){expect('error resolving').toEqual('_');} //the undefined exception doesn't get caught so check and fail manually.
                 expect(_.VERSION).toEqual('1.5.2');
             });
         });
@@ -478,6 +482,7 @@ describe("modulus async shims", function(){
         runs(function(){
             m(function(Backbone){
                 callbackCount++;
+                if(!Backbone){expect('error resolving').toEqual('Backbone');}
                 expect(Backbone.VERSION).toEqual('1.1.0');
             });
         });

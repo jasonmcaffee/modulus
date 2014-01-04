@@ -39,6 +39,14 @@
 //             }
         },
         /**
+         * The object which will be referenced to retrieve the shim's exports.
+         * e.g. _shimContext['$']
+         * Typically this should be window. Primarily exposed in order to property unit test ie8, as it has a bug around deleting from the window object.
+         * By specifying a custom shim context, we can assign and delete in ie8 so that we can properly reset before performing a test.
+         */
+        _shimContext: window,
+
+        /**
          * Hash of module names to 'path', where path can be any value you want to represent the file location.
          * If you use this option, you must implement asyncFileLoad
          * e.g. {'moduleName' : 'path/to/module'}
@@ -512,7 +520,7 @@
          */
         _resolveShim:function(shimName, shimConfig){
             var result = {};
-            result.shimResult = window[shimConfig.exports];
+            result.shimResult = this._shimContext[shimConfig.exports];
             result.success = typeof result.shimResult != 'undefined';
             return result;
         },

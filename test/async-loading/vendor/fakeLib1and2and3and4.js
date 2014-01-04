@@ -1,1 +1,2 @@
-window.fakeLib1and2and3and4 = fakeLib1 + fakeLib2 + fakeLib3 + fakeLib4; ///needs to be on window so i can delete during testing.
+var fakeWindow = fakeWindow || {};//ie8 cant delete window properties, and that interferes with unit test resets.
+fakeWindow.fakeLib1and2and3and4 = fakeWindow.fakeLib1 + fakeWindow.fakeLib2 + fakeWindow.fakeLib3 + fakeWindow.fakeLib4; ///needs to be on window so i can delete during testing.
