@@ -417,6 +417,61 @@
         </pre>
         <div style="display:none">```</div>
 
+        <h1>Tests</h1>
+        <p>
+            Modulus is thoroughly tested using Jasmine. <br/>
+            You can reference the below table to see the tests in action, as well as reference example project setups.
+        </p>
+        <table>
+            <tr>
+                <th>Test Link</th><th>Spec Link</th><th>Test Project Link</th><th>Build File</th><th>Notes</th>
+            </tr>
+            <tr>
+                <td><a href="http://modulusjs.org/test-async-loading.html">Runtime: Async Loading</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/test/async-loading/async-loading-spec.js">async-loading-spec</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/tree/master/test/async-loading">async loading</a></td>
+                <td>n/a</td>
+                <td>Runtime project which uses the m(function moduleName(){...}) syntax to demonstrate the async loading of modules</td>
+            </tr>
+            <tr>
+                <td><a href="http://modulusjs.org/test-async-loading-global-functions.html">Runtime: Async Loading with Global Functions</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/test/async-loading-global-functions/async-loading-global-functions-spec.js">async-loading-global-functions-spec</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/tree/master/test/async-loading-global-functions">async loading global functions</a></td>
+                <td>n/a</td>
+                <td>Runtime project which uses the function moduleName(dep1){...} syntax to demonstrate the async loading of modules</td>
+            </tr>
+            <tr>
+                <td><a href="http://modulusjs.org/test-buildtime-project.html">Buildtime: Built Project 1</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/test/buildtime-project/buildtime-spec.js">buildtime-project-spec</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/tree/master/test/buildtime-project">buildtime project 1</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/grunt-tasks/test/buildtime-project/build.js">build.js</a></td>
+                <td>Project which defines modules using global functions, and is built into 2 js files: global.js and pageOne.js.</td>
+            </tr>
+            <tr>
+                <td><a href="http://modulusjs.org/test-buildtime-project2.html">Buildtime: Built Project 2</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/test/buildtime-project2/buildtime-spec.js">buildtime-project-spec</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/tree/master/test/buildtime-project2">buildtime project 2</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/grunt-tasks/test/buildtime-project2/build.js">build.js</a></td>
+                <td>Project which defines by assigning modules to a context/namespace object, and is built into 2 js files: global.js and pageOne.js.</td>
+            </tr>
+            <tr>
+                <td><a href="http://modulusjs.org/test-buildtime-project3.html">Buildtime: Built Project 3</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/test/buildtime-project3/buildtime-spec.js">buildtime-project-spec</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/tree/master/test/buildtime-project3">buildtime project 3</a></td>
+                <td><a href="https://github.com/jasonmcaffee/modulus/blob/master/grunt-tasks/test/buildtime-project3/build.js">build.js</a></td>
+                <td>Project which defines by assigning using the modulus function m(function moduleName(dep1){...}), and is built into 2 js files: global.js and pageOne.js.</td>
+            </tr>
+        </table>
+
+        <h1>Browser Support</h1>
+        <p>
+            IE8+ <br/>
+            Chrome <br/>
+            Firefox <br/>
+            Safari <br/>
+            Android <br/>
+            iOS <br/>
+        </p>
 
         <h1>Try It Out</h1>
         <h2>Codio</h2>

@@ -18,6 +18,7 @@ module.exports = function (grunt) {
         modulusWebsite.fontDist = dist + '/fonts';
         modulusWebsite.imgSrc = src + '/img';
         modulusWebsite.imgDist = dist + '/img';
+        modulusWebsite.testDist = dist + '/test';
     }
 
     var uglifyConfig = {
@@ -55,7 +56,14 @@ module.exports = function (grunt) {
                 expand: true,
                 src: '**/*',
                 dest: modulusWebsite.jsDist
-            }
+            },
+//            //first copy all of test files
+//            testFiles:{
+//                cwd:'test/',
+//                expand:true,
+//                src:'**/*',
+//                dest: modulusWebsite.testDist
+//            }
         },
 //        watch: {
 //            scripts: {

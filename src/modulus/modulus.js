@@ -498,7 +498,7 @@
          */
         _resolveModule: function(module){
             try{
-                module.initResult = module.init.apply(null, module.resolvedDependencies);
+                module.initResult = module.init.apply(null, module.resolvedDependencies || []);//fix for ie8 bug. must have value for apply
                 module.isInitialized = true;
             }catch(e){
                 throw e;
@@ -630,7 +630,7 @@
         }
         var end = new Date().getTime();
         var total = end-start;
-        console.log('modulus initialized in %s ms', total);
+        //console.log('modulus initialized in %s ms', total);
     };
 
     /**

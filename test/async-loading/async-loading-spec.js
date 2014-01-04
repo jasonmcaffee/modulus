@@ -1,61 +1,61 @@
-xdescribe("modulus", function(){
-    it("should allow modules to be registered without init", function(){
-        var callbackCount=0;
-        m(function mOne(){
-            return 1;
-        });
-
-        m(function mTwo(mOne){
-            return 1 + mOne;
-        });
-
-        runs(function(){
-            m(function(mTwo){
-                callbackCount++;
-                expect(mTwo).toEqual(2);
-            });
-        });
-
-        waits(20);
-
-        runs(function(){
-            expect(callbackCount).toEqual(1);
-        });
-
-    });
-
-    it("should not allow modules to be required before they have been registered (unless async function is provided)", function(){
-        modulus.reset();
-        var callbackCount= 0, exceptionCount=0;;
-        runs(function(){
-            //require
-            try{
-                m(function(mOne){
-                    callbackCount++;
-                    expect(mOne).toEqual(1);
-                });
-            }catch(e){
-                exceptionCount++;
-            }
-
-            //define
-            m(function mOne(){
-                return 1;
-            });
-        });
-
-        waits(20);
-
-        runs(function(){
-            expect(callbackCount).toEqual(0);
-            expect(exceptionCount).toEqual(1);
-        });
-
-    });
-});
+//xdescribe("modulus", function(){
+//    it("should allow modules to be registered without init", function(){
+//        var callbackCount=0;
+//        m(function mOne(){
+//            return 1;
+//        });
+//
+//        m(function mTwo(mOne){
+//            return 1 + mOne;
+//        });
+//
+//        runs(function(){
+//            m(function(mTwo){
+//                callbackCount++;
+//                expect(mTwo).toEqual(2);
+//            });
+//        });
+//
+//        waits(20);
+//
+//        runs(function(){
+//            expect(callbackCount).toEqual(1);
+//        });
+//
+//    });
+//
+//    it("should not allow modules to be required before they have been registered (unless async function is provided)", function(){
+//        modulus.reset();
+//        var callbackCount= 0, exceptionCount=0;;
+//        runs(function(){
+//            //require
+//            try{
+//                m(function(mOne){
+//                    callbackCount++;
+//                    expect(mOne).toEqual(1);
+//                });
+//            }catch(e){
+//                exceptionCount++;
+//            }
+//
+//            //define
+//            m(function mOne(){
+//                return 1;
+//            });
+//        });
+//
+//        waits(20);
+//
+//        runs(function(){
+//            expect(callbackCount).toEqual(0);
+//            expect(exceptionCount).toEqual(1);
+//        });
+//
+//    });
+//});
 
 //i suspect the ajaxFileLoad is interfering with above test.
-describe("modulus async modules", function(){
+xdescribe("modulus async modules", function(){
 
     var ajaxCount = 0;
     var testCallback;
@@ -235,18 +235,22 @@ describe("modulus async shims", function(){
     var ajaxCount = 0;
     var testCallback;
 
-    beforeEach(function(){
+    function resetModulus(){
         ajaxCount = 0;
         testCallback = null;
         modulus.reset();
-        delete window.fakeLib2and3;
-        delete window.fakeLib1and2and3and4;
-        delete window.fakeLib1;
-        delete window.fakeLib2;
-        delete window.fakeLib3;
-        delete window.fakeLib4;
-        delete window._;
-        delete window.Backbone;
+        //we have to delete as modulus iterates of object properties, and doesn't care about the value (undefineds are allowed).
+        //if the property name exists,
+        //issues in ie8
+        //http://perfectionkills.com/understanding-delete/#ie_bugs
+        try{window['fakeLib2and3'] = undefined; delete window.fakeLib2and3;}catch(e){}
+        try{delete window.fakeLib1and2and3and4;}catch(e){}
+        try{delete window.fakeLib1;}catch(e){}
+        try{delete window.fakeLib2;}catch(e){}
+        try{delete window.fakeLib3;}catch(e){}
+        try{delete window.fakeLib4; }catch(e){}
+        try{delete window._;  }catch(e){}
+        try{delete window.Backbone; }catch(e){}
         modulus.init({
             //any modules you want to include that aren't modulus compliant. e.g. myModule($) would get the result of this path
             shim:{
@@ -318,12 +322,18 @@ describe("modulus async shims", function(){
                 }).fail(function(err){errorback(err)});
             }
         });
+    }
+    beforeEach(function(){
+        resetModulus();
     });
 
 
    it("should support async loading of a single shim with no dependencies", function(){
         var callbackExecuted = false;
+       //runs a require twice. the first time should initiate an ajax call, the second time should not.
+
         runs(function(){
+            //resetModulus();//beforeeach not working well in ie8 with runs. call explicitly
             m(function(fakeLib1){
                 callbackExecuted = true;
                 expect(fakeLib1).toEqual(1);

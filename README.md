@@ -456,7 +456,8 @@ sudo npm install grunt-cli@0.1.9 -g
 ```
 ###Build
 ```shell
-grunt build
+#build test projects
+grunt build-test
 ```
 ##Release Notes
 ### 0.0.8
