@@ -470,10 +470,14 @@ grunt build
 * protection against minification for all modulus usage options.
 * Explicit define api. e.g. m('moduleName', ['dep1', 'dep2'], function moduleName(dep1, dep2){...});
 
-### 0.0.1
+### 0.0.5
+* several issues fixed.
+
+### 0.0.1 through 0.0.4
 In progress.
 * Runtime configuration - basic poc of functionality working and shown on codio.
 * Build configuration - basic functionality shown with grunt test-commonjs-module and src/modules.
+* Runtime API for namespaced module registration, global module functions, and modulus function calls.
 
 
 
