@@ -54,6 +54,11 @@
 //    });
 //});
 
+var waitTime = 1000;
+
+if(window.location.href && window.location.href.indexOf('?slow') >=0){
+    waitTime = 5000;
+}
 //i suspect the ajaxFileLoad is interfering with above test.
 describe("modulus async modules", function(){
 
@@ -118,7 +123,7 @@ describe("modulus async modules", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -135,7 +140,7 @@ describe("modulus async modules", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -163,7 +168,7 @@ describe("modulus async modules", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -202,7 +207,7 @@ describe("modulus async modules", function(){
             });
         });
 
-        waits(3000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -222,7 +227,7 @@ describe("modulus async modules", function(){
             });
         });
 
-        waits(3000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecutedCount).toEqual(1);
@@ -344,7 +349,7 @@ describe("modulus async shims", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -360,7 +365,7 @@ describe("modulus async shims", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
         runs(function(){
             m(function(fakeLib1){
                 callbackExecuted = true;
@@ -392,7 +397,7 @@ describe("modulus async shims", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -431,7 +436,7 @@ describe("modulus async shims", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecuted).toEqual(true);
@@ -454,7 +459,7 @@ describe("modulus async shims", function(){
             });
         });
 
-        waits(1000);
+        waits(waitTime);
 
         runs(function(){
             expect(callbackExecutedCount).toEqual(1);
@@ -472,7 +477,7 @@ describe("modulus async shims", function(){
                 expect(_.VERSION).toEqual('1.5.2');
             });
         });
-        waits(1000);
+        waits(waitTime);
         runs(function(){
             expect(callbackCount).toEqual(1);
         });
@@ -487,7 +492,7 @@ describe("modulus async shims", function(){
                 expect(Backbone.VERSION).toEqual('1.1.0');
             });
         });
-        waits(1000);
+        waits(waitTime);
         runs(function(){
             expect(callbackCount).toEqual(1);
         });
