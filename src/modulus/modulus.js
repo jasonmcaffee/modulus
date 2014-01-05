@@ -150,6 +150,7 @@
                 var errorMessage = 'modulus: error initializing module.name: ' + (module.name || 'anonymous' )+ '\n error:'; //+ ' \n error: ' + e
                 //console.error(errorMessage);
                 e.message = errorMessage + e.message;
+                errorback(e);
                 throw e; //do not swallow exceptions! if there's any error in the module init, we need to let it propogate.
             }
         },
