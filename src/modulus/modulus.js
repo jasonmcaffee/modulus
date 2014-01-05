@@ -364,11 +364,17 @@
          * Adds the module to this._modules.
          * e.g. this.modules[module.name] = module
          * If the module is already added, it will not be overridden, unless it is a shim
+         *
+         * When using AMD, this function usually gets called twice for a module:
+         * 1- something requires a module which hasn't been loaded yet. This function gets called to store a partial version of the module.
+         * 2- the module loads (usually a result of something requiring it) and this function is called to fill in the blanks (deps, init function, etc)
+         * see _getModules
          * @param module - the module you wish to register.
          */
         _registerModule: function(module){
             //log('_registerModule called for module.name %s', module.name);
             //if we're in amd mode we need to modify the current module to add dependencies, etc.
+            //this code block is executed when the module gets loaded and registered. (the second call to this function regarding the module.)
             if(this._modules[module.name] && this._modules[module.name].isPartial){
                 //don't just reassign it because it has other references in initModules, etc.
                 //TODO: create a copy function for this so we don't miss stuff.

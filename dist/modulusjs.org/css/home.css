@@ -14,7 +14,8 @@ header {
   padding-bottom: 20px;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  height: 90%; }
+  height: 90%;
+  width: 90%; }
 
 .main-content::-webkit-scrollbar {
   display: none; }
@@ -54,7 +55,7 @@ header {
   display: none; }
 
 .syntaxhighlighter {
-  width: 80% !important; }
+  width: 95% !important; }
 
 * {
   -webkit-box-sizing: border-box;
@@ -93,9 +94,8 @@ h3 {
   color: #848484; }
 
 h4 {
-    font-size:20px;
-    color: #A5A5A5;
-}
+  font-size: 20px;
+  color: #A5A5A5; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;
