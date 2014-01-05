@@ -108,6 +108,7 @@ describe("modulus async modules", function(){
         }
     });
 
+
     it("should support async loading of a single module with no dependencies", function(){
         var callbackExecuted = false;
         runs(function(){

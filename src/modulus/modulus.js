@@ -475,8 +475,11 @@
          * @returns {boolean} - whether val is a module.
          */
         _isModule: function(val, context, key){
-            var isModule = false;
-            if(context.hasOwnProperty(key) && typeof val === "function"){
+            var isModule = false,
+                //ie8 intermittently doesnt support window.hasOwnProperty
+                existsInContext = context.hasOwnProperty? context.hasOwnProperty(key) : Object.prototype.hasOwnProperty.call(context, key);
+
+            if(existsInContext && typeof val === "function"){
                 isModule = true;
             }
             return isModule;

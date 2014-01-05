@@ -90,7 +90,12 @@ h2 {
 
 h3 {
   font-size: 24px;
-  color: #e9e9ea; }
+  color: #848484; }
+
+h4 {
+    font-size:20px;
+    color: #A5A5A5;
+}
 
 h1, h2, h3, h4, h5, h6 {
   font-family: roboto_condensedregular, "Helvetica Neue", Helvetica, arial, freesans, clean;

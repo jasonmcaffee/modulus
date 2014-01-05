@@ -409,6 +409,7 @@ describe("modulus async shims", function(){
         runs(function(){
             m(function(_){
                 callbackCount++;
+                if(!_){expect('did not load _').toEqual('correctly')}
                 expect(_.VERSION).toEqual('1.5.2');
             });
         });
@@ -423,6 +424,7 @@ describe("modulus async shims", function(){
         runs(function(){
             m(function(Backbone){
                 callbackCount++;
+                if(!Backbone){expect('did not load backbone').toEqual('correctly');}
                 expect(Backbone.VERSION).toEqual('1.1.0');
             });
         });

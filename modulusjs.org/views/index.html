@@ -107,7 +107,8 @@
             <h3>Global Module Functions</h3>
             <p>
                 In perhaps the easiest way possible, Modulus allows you to define modules with global functions.<br/>
-                Any dependencies on other modules are simply identified via parameter names, where the parameter name matches the name of the desired module.
+                Any dependencies on other modules are simply identified via parameter names, where the parameter name matches the name of the desired module. <br/>
+                NOTE: THIS OPTION DOES NOT WORK IN IE8.  <a href="http://blogs.msdn.com/b/ericlippert/archive/2005/05/04/414684.aspx">Global variables are not enumerable in IE8.</a>
             </p>
             <div style="display:none">```javascript</div>
             <pre class="brush: js">
@@ -465,7 +466,7 @@
 
         <h1>Browser Support</h1>
         <p>
-            IE8+ <br/>
+            IE8+ (except for the global module functions option)<br/>
             Chrome <br/>
             Firefox <br/>
             Safari <br/>
